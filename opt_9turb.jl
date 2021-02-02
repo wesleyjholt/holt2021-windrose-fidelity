@@ -13,7 +13,7 @@ layout_filename = "initial-layout-9turb-circular-" * lpad(layout_number,3,"0") *
 windrose_directory = "windrose-files/"
 windrose_filename = "nantucket-windrose-ave-speeds-" * lpad(ndirs,3,"0") * "dirs.txt"
 output_layout_directory = "final-layouts/9turb-circular/"
-output_layout_filename = "final-layout-9turb-circular-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec.txt"
+output_layout_filename = "final-layout-9turb-circular-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec.yaml"
 output_wec_layouts = "final-layout-9turb-circular-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-weclayouthistory.txt"
 
 # set up boundary constraint wrapper function
@@ -225,4 +225,4 @@ plt.gcf().gca().add_artist(plt.Circle((boundary_center[1],boundary_center[2]), b
 axis("square")
 xlim(-boundary_radius-200,boundary_radius+200)
 ylim(-boundary_radius-200,boundary_radius+200)
-plt.show()
+# plt.show()

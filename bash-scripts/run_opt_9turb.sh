@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=2048M  # memory per CPU core
-#SBATCH --time=00:05:00 # walltime
+#SBATCH --mem-per-cpu=4096M  # memory per CPU core
+#SBATCH --time=01:20:00 # walltime
 #SBATCH -J 'Wind Rose Study. 9 turbs. alg: snopt.'
 #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 #SBATCH --mail-type=BEGIN
