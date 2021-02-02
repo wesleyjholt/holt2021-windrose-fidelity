@@ -8,7 +8,7 @@
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --array=1-10    # job array number corresponds to the layout numbers
-#SBATCH --qos=test
+# #SBATCH --qos=test
 
 ndirs=$1
 layout_number=${SLURM_ARRAY_TASK_ID}
