@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 8"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 34535.331322693935
+        binned: 70
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-070dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -239.13530117136162
+        - -380.7355605778133
+      -
+        - 376.45496010334597
+        - -246.53937557996235
+      -
+        - 247.46497401536985
+        - 324.026767885696
+      -
+        - 94.22828102012966
+        - -218.14610019082352
+      -
+        - -326.28040149424635
+        - 309.90501857223404
+      -
+        - -5.82358795303817
+        - 352.84046526444763
+      -
+        - -448.973609312599
+        - -30.376106930160933
+      -
+        - 431.1294227738994
+        - 128.94742805044217
+      -
+        - 187.17927058714747
+        - 60.15076111666872
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 450.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."
