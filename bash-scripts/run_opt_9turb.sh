@@ -10,8 +10,8 @@
 #SBATCH --array=1-2    # job array number corresponds to the layout numbers
 #SBATCH --qos=test
 
-ndirs = $1
-layout_number = ${SLURM_ARRAY_TASK_ID}
+ndirs=$1
+layout_number=${SLURM_ARRAY_TASK_ID}
 echo "Optimizing layout ${layout_number} with ${ndirs} directions."
 
 module load julia
