@@ -16,4 +16,4 @@ echo "Optimizing layout ${layout_number} with ${ndirs} directions."
 
 module load julia/1.4
 cd ".."
-julia opt_9turb.jl ${layout_number} ${ndirs}
+julia opt_9turb.jl ${ndirs} ${layout_number}
