@@ -61,7 +61,7 @@ function generate_random_layout_circle_boundary(layout_filename, nturbines, roto
     # turbinefile="", locunits="m", wakemodelused="", windresourcefile="", aeptotal=[], 
     # aepdirs=[], aepunits="MWh", baseyaml="initial-layouts/default_turbine_layout.yaml")
 
-    # write out interpolated wind rose file
+    # write out turbine coordinates file
     open(layout_directory * layout_filename, "w") do io
         write(io, "# turbine_x, turbine_y\n")
         writedlm(io, [turbine_x turbine_y])
