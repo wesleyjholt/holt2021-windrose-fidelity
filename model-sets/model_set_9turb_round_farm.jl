@@ -93,7 +93,7 @@ wakecombinationmodel = ff.LinearLocalVelocitySuperposition()
 
 # the local turbulence intensity models can be used to estimate the local turbulence intensity at each wind turbine or point to provide
 # more accurate input information to the wake and deflection models if applicable.
-localtimodel = ff.LocalTIModelMaxTI()
+localtimodel = ff.LocalTIModelNoLocalTI()
 
 # initialize model set. This is just a convenience container for the analysis models.
 model_set = ff.WindFarmModelSet(wakedeficitmodel, wakedeflectionmodel, wakecombinationmodel, localtimodel)
