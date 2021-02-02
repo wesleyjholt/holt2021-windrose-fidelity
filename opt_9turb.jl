@@ -4,14 +4,17 @@ using PyPlot
 import ForwardDiff
 
 # variables to get from SLURM: layout_number, ndirs
-layout_number = 2
-ndirs = 20
+layout_number = 1
+ndirs = 360
 
 # set directory and file names (must do this before including the model set file)
 layout_directory = "initial-layouts/"
 layout_filename = "initial-layout-9turb-circular-" * lpad(layout_number,3,"0") * ".txt"
 windrose_directory = "windrose-files/"
 windrose_filename = "nantucket-windrose-ave-speeds-" * lpad(ndirs,3,"0") * "dirs.txt"
+output_layout_directory = "final-layouts/9turb-circular/"
+output_layout_filename = "final-layout-9turb-circular-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec.txt"
+output_wec_layouts = "final-layout-9turb-circular-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-weclayouthistory.txt"
 
 # set up boundary constraint wrapper function
 function boundary_wrapper(x, params)
@@ -134,6 +137,7 @@ params = params_struct2(model_set, rotor_points_y, rotor_points_z, turbine_z,
 x = [copy(turbine_x);copy(turbine_y)]
 xinit = deepcopy(x)
 # report initial objective value
+initial_obj = aep_wrapper(x, params)[1]
 println("starting objective value: ", aep_wrapper(x, params)[1])
 
 # add initial turbine location to plot
@@ -149,10 +153,20 @@ ub = zeros(length(x)) .+ boundary_radius
 options = Dict{String, Any}()
 options["Derivative option"] = 1
 options["Verify level"] = 3
-options["Major optimality tolerance"] = 1e-5
+options["Major optimality tolerance"] = 5e-5
 options["Major iteration limit"] = 1e6
-options["Summary file"] = "opt-output-files/snopt-opt-" * string(ndirs) * "dirs-" * string(layout_number) * "-summary.out"
-options["Print file"] = "opt-output-files/snopt-opt-" * string(ndirs) * "dirs-" * string(layout_number) * "-print.out"
+
+# set up for WEC optimization
+wec_steps = 6
+wec_max = 3.0
+wec_end = 1.0
+wec_values = collect(LinRange(wec_max, wec_end, wec_steps))
+
+# initialize xopt array
+noptimizations = wec_steps + 2
+xopt_all = zeros(2*nturbines,noptimizations)
+xopt_all[:,1] = [deepcopy(turbine_x);deepcopy(turbine_y)]
+x = [deepcopy(turbine_x);deepcopy(turbine_y)]
 
 # generate wrapper function surrogates
 spacing_wrapper(x) = spacing_wrapper(x, params)
@@ -160,20 +174,44 @@ aep_wrapper(x) = aep_wrapper(x, params)
 boundary_wrapper(x) = boundary_wrapper(x, params)
 obj_func(x) = wind_farm_opt(x)
 
-# run and time optimization
-t1 = time()
-xopt, fopt, info = snopt(obj_func, x, lb, ub, options)
-t2 = time()
-clkt = t2-t1
+# run optimizations
+for i = 1:length(wec_values)
+    params.model_set.wake_deficit_model.wec_factor[1] = wec_values[i]
+    println("Now running with WEC = ", round(params.model_set.wake_deficit_model.wec_factor[1],digits=1), " and no local TI")
+    options["Summary file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-nolocalTI-summary.out"
+    options["Print file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-nolocalTI-print.out"
+    xopt_all[:,i+1], fopt, info = snopt(obj_func, x, lb, ub, options)
+end
+
+localtimodel = ff.LocalTIModelMaxTI()
+model_set = ff.WindFarmModelSet(wakedeficitmodel, wakedeflectionmodel, wakecombinationmodel, localtimodel)
+options["Summary file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-summary.out"
+options["Print file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-print.out"
+println("Now running with WEC = ", round(params.model_set.wake_deficit_model.wec_factor[1],digits=1), " with local TI")
+xopt_all[:,end], fopt, info = snopt(obj_func, x, lb, ub, options)
 
 # print optimization results
-println("Finished in : ", clkt, " (s)")
 println("info: ", info)
-println("end objective value: ", aep_wrapper(xopt))
+xopt = xopt_all[:,end]
+final_obj = aep_wrapper(xopt)[1]
+println("end objective value: ", final_obj)
 
 # extract final turbine locations
 turbine_x = copy(xopt[1:nturbines])
 turbine_y = copy(xopt[nturbines+1:end])
+
+# save final layout to YAML
+ff.write_turb_loc_YAML(output_layout_directory * output_layout_filename, turbine_x, turbine_y; 
+    title="Optimized $nturbines-turbine layout for a circular boundary wind farm. Layout: $layout_number", 
+    titledescription="Contains optimized coordinates for $nturbines turbines arranged in a circular boundary wind farm with a boundary radius of $boundary_radius m. The farm is centered at the coordinate ($(boundary_center[1]), $(boundary_center[2])). Each turbine has a rotor diameter of $rotor_diameter m.", 
+    turbinefile="input-files/NREL5MWCPCT.txt", locunits="m", wakemodelused="Bastankhah and Porté-Agel (2016)", windresourcefile="windrose-files/nantucket-windrose-ave-speeds-" * lpad(ndirs,3,"0") * "dirs.txt", aeptotal=final_obj*1e-6/params.obj_scale, 
+    aepdirs=ndirs, aepunits="MWh", baseyaml="initial-layouts/default_turbine_layout.yaml")
+
+# save WEC layout history to txt file
+open(output_layout_directory * output_wec_layouts, "w") do io
+    write(io, "# initial, wec=3.0, wec=2.6, wec=2.2, wec=1.8, wec=1.4, wec=1.0, wec=1.0_withlocTI\n")
+    writedlm(io, xopt_all)
+end
 
 # add final turbine locations to plot
 for i = 1:length(turbine_x)
