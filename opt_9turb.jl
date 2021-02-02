@@ -4,8 +4,8 @@ using PyPlot
 import ForwardDiff
 
 # variables to get from SLURM: layout_number, ndirs
-layout_number = 1
-ndirs = 360
+layout_number = Base.parse(Int, ENV["layout_number"])
+ndirs = Base.parse(Int, ENV["ndirs"])
 
 # set directory and file names (must do this before including the model set file)
 layout_directory = "initial-layouts/"
