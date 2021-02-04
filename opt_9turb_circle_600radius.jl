@@ -8,13 +8,13 @@ ndirs = Base.parse(Int, ARGS[1])
 layout_number = Base.parse(Int, ARGS[2])
 
 # set directory and file names (must do this before including the model set file)
-layout_directory = "initial-layouts/"
+layout_directory = "initial-layouts/9turb-circle-450radius/"
 layout_filename = "initial-layout-9turb-circular-" * lpad(layout_number,3,"0") * ".txt"
-windrose_directory = "windrose-files/"
+windrose_directory = "windrose-files/nantucket/"
 windrose_filename = "nantucket-windrose-ave-speeds-" * lpad(ndirs,3,"0") * "dirs.txt"
-output_layout_directory = "final-layouts/9turb-circle-600radius/"
-output_layout_filename = "final-layout-9turb-circle-600radius-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec.yaml"
-output_wec_layouts = "final-layout-9turb-circle-600radius-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-weclayouthistory.txt"
+output_layout_directory = "final-layouts/9turb-circle-600radius/" * lpad(ndirs,3,"0") * "dirs/"
+output_layout_filename = "final-layout-" * lpad(layout_number,3,"0") * "-wec.yaml"
+output_wec_layouts = "final-layout-" * lpad(layout_number,3,"0") * "-weclayouthistory.txt"
 
 # set up boundary constraint wrapper function
 function boundary_wrapper(x, params)
@@ -125,7 +125,7 @@ obj_scale = 1E-11
 
 # set wind farm boundary parameters
 boundary_center = [0.0,0.0]
-boundary_radius = 450.0
+boundary_radius = 600.0
 
 # initialize struct for opt params
 params = params_struct2(model_set, rotor_points_y, rotor_points_z, turbine_z, 
@@ -152,7 +152,7 @@ ub = zeros(length(x)) .+ boundary_radius
 # set up options for SNOPT
 options = Dict{String, Any}()
 options["Derivative option"] = 1
-options["Verify level"] = 3
+options["Verify level"] = -1
 options["Major optimality tolerance"] = 5e-5
 options["Major iteration limit"] = 1e6
 
@@ -178,15 +178,15 @@ obj_func(x) = wind_farm_opt(x)
 for i = 1:length(wec_values)
     params.model_set.wake_deficit_model.wec_factor[1] = wec_values[i]
     println("Now running with WEC = ", round(params.model_set.wake_deficit_model.wec_factor[1],digits=1), " and no local TI")
-    options["Summary file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-nolocalTI-summary.out"
-    options["Print file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-nolocalTI-print.out"
+    options["Summary file"] = "opt-files/9turb-circle-600radius/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-summary.out"
+    options["Print file"] = "opt-files/9turb-circle-600radius/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[i],digits=1),3,"0") * "-print.out"
     xopt_all[:,i+1], fopt, info = snopt(obj_func, x, lb, ub, options)
 end
 
 localtimodel = ff.LocalTIModelMaxTI()
 model_set = ff.WindFarmModelSet(wakedeficitmodel, wakedeflectionmodel, wakecombinationmodel, localtimodel)
-options["Summary file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-summary.out"
-options["Print file"] = "opt-out-files/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-opt-" * lpad(ndirs,3,"0") * "dirs-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-print.out"
+options["Summary file"] = "opt-files/9turb-circle-600radius/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-TI-summary.out"
+options["Print file"] = "opt-files/9turb-circle-600radius/" * lpad(ndirs,3,"0") * "dirs/" * "snopt-" * lpad(layout_number,3,"0") * "-wec" * rpad(round(wec_values[end],digits=1),3,"0") * "-TI-print.out"
 println("Now running with WEC = ", round(params.model_set.wake_deficit_model.wec_factor[1],digits=1), " with local TI")
 xopt_all[:,end], fopt, info = snopt(obj_func, x, lb, ub, options)
 
