@@ -27,9 +27,11 @@ rated_power = zeros(nturbines) .+ 5.0E6  # W
 generator_efficiency = zeros(nturbines) .+ 0.944
 
 # rotor swept area sample points (sunflower pattern with n=100)
-rotor_points = readdlm("input-files/sunflower_pattern_100.txt", skipstart=1)
-rotor_points_y = rotor_points[:,1]
-rotor_points_z = rotor_points[:,2]
+# rotor_points = readdlm("input-files/sunflower_pattern_100.txt", skipstart=1)
+# rotor_points_y = rotor_points[:,1]
+# rotor_points_z = rotor_points[:,2]
+rotor_points_y = [0.0]
+rotor_points_z = [0.0]
 
 # set flow parameters
 windrose_data = readdlm(windrose_directory * windrose_filename, skipstart=1)
@@ -55,7 +57,7 @@ windresource = ff.DiscretizedWindResource(winddirections, windspeeds, windprobab
     measurementheight, air_density, ambient_tis, wind_shear_model)
 
 # get turbine data
-turbinedata = readdlm("input-files/NREL5MWCPCT.txt", skipstart=1)
+turbinedata = readdlm("input-files/NREL5MWCPCT.txt", skipstart=2)
 velpoints = turbinedata[:,1]
 cppoints = turbinedata[:,2]
 ctpoints = turbinedata[:,3]

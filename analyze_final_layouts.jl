@@ -46,10 +46,10 @@ end
 # set ndirs and layout number
 ndirs = 360 # this number matters for the analysis
 layout_number = 1 # this number doesn't matter
-farm = "9turb-circle-600radius"
+farm = "9turb-circle-450r"
 
 # set directory and file names (must do this before including the model set file)
-layout_directory = "initial-layouts/9turb-circle-600radius/"
+layout_directory = "initial-layouts/9turb-circle-450radius/"
 layout_filename = "initial-layout-9turb-circular-" * lpad(layout_number,3,"0") * ".txt"
 windrose_directory = "windrose-files/nantucket/"
 windrose_filename = "nantucket-windrose-ave-speeds-" * lpad(ndirs,3,"0") * "dirs.txt"
@@ -62,9 +62,9 @@ obj_scale = 1E-6
 
 # set wind farm boundary parameters
 boundary_center = [0.0,0.0]
-if farm=="9turb-circle-600radius"
+if farm=="9turb-circle-600r"
     boundary_radius = 600.0
-elseif farm=="9turb-circle-450radius"
+elseif farm=="9turb-circle-450r"
     boundary_radius = 450.0
 end
 
@@ -79,13 +79,15 @@ params = params_struct2(model_set, rotor_points_y, rotor_points_z, turbine_z,
 
 plot=true
 
-initial_layout_directory = "initial-layouts/9turb-circle-450radius/"
+initial_layout_directory = "initial-layouts/9turb-circle-450r/"
 
 nlayouts = 20
 ndirs_vec = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 120, 150, 200, 360]
 
-aeps = zeros(nlayouts, length(ndirs_vec))
-aeps_360dirs = zeros(nlayouts, length(ndirs_vec))
+aeps_initial_layouts = zeros(nlayouts, length(ndirs_vec))
+aeps_initial_layouts_360dirs = zeros(nlayouts, length(ndirs_vec))
+aeps_final_layouts = zeros(nlayouts, length(ndirs_vec))
+aeps_final_layouts_360dirs = zeros(nlayouts, length(ndirs_vec))
 
 for layout_number = 1:nlayouts
     for (i, ndirs_reference) in enumerate(ndirs_vec)
