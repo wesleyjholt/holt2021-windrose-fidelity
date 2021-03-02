@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 14"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 35663.56280429875
+        binned: 70
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-070dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -306.18691757355487
+        - -83.07006154512476
+      -
+        - 237.9613549149261
+        - 287.6069158872065
+      -
+        - 51.24918677831831
+        - -473.7917395960948
+      -
+        - -39.90296820803361
+        - 476.0413695161898
+      -
+        - 419.70077493579083
+        - 45.95896317260482
+      -
+        - -269.4893740368669
+        - 169.0551085348441
+      -
+        - 294.1688162901681
+        - -373.2571980411931
+      -
+        - -522.6615205277251
+        - 88.1329201852606
+      -
+        - -45.480658955696356
+        - -233.37273694210975
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 600.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."
