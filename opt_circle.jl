@@ -249,5 +249,5 @@ plt.gcf().gca().add_artist(plt.Circle((boundary_center[1],boundary_center[2]), b
 axis("square")
 xlim(boundary_center[1] - boundary_radius*1.3, boundary_center[1] + boundary_radius*1.3)
 ylim(boundary_center[2] - boundary_radius*1.3, boundary_center[1] + boundary_radius*1.3)
-savefig("final-layouts/9turb-circle-" * boundary_radius_string * "r-figures/snopt-wec/" * ndirs * "dirs/final-layout-" * layout_number * "wec.png")
-plt.show()
+# savefig("final-layouts/9turb-circle-" * boundary_radius_string * "r-figures/snopt-wec/" * ndirs * "dirs/final-layout-" * layout_number * "wec.png")
+# plt.show()
