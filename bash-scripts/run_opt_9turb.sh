@@ -17,4 +17,4 @@ echo "Optimizing layout ${layout_number} with ${ndirs} directions."
 module load julia/1.4
 cd ".."
 # change the julia filename(s) below based on what farm boundary to use
-julia opt_9turb_circle_600radius.jl ${ndirs} ${layout_number}
+julia opt_9turb_circle.jl ${ndirs} ${layout_number}

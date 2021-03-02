@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 51"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 47508.09763368019
+        binned: 10
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-010dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -869.2057218347076
+        - -25.334595825566776
+      -
+        - 825.8905194322409
+        - 323.63771697641516
+      -
+        - -569.7652086461256
+        - -679.791776962052
+      -
+        - 18.599890730239586
+        - 843.1178374765731
+      -
+        - 654.3293872956327
+        - -558.1456947570517
+      -
+        - 157.41698200297643
+        - -237.02543259023784
+      -
+        - -142.65840638716742
+        - 389.12317322678695
+      -
+        - -770.6143938377103
+        - 360.3170871855966
+      -
+        - 349.7733043508976
+        - -774.3630866633916
+    description: |-
+      an array of x and y-coordinates [x0, y0] 
+       [x1, y1] 
+       ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 900.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."
