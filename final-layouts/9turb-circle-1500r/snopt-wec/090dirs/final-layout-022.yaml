@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 022"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 48304.140174146974
+        binned: "090"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-090dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 415.18720402105873
+        - -206.83874005006606
+      -
+        - -1459.6925784026616
+        - 345.39481257857665
+      -
+        - 1473.631384947497
+        - -280.01882311323476
+      -
+        - 590.9845445328759
+        - -1378.6722845271345
+      -
+        - -1362.6206778906935
+        - -627.1083544210732
+      -
+        - 1218.6765056846364
+        - 874.5442095699244
+      -
+        - -718.1018129857981
+        - 1316.9395529736778
+      -
+        - 316.0267213370397
+        - 1466.331173848855
+      -
+        - -508.98230687240107
+        - -1411.0056737273771
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 1500.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."

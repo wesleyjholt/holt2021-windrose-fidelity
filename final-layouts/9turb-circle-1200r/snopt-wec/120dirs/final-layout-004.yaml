@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 004"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 47266.302009567175
+        binned: "120"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-120dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 1177.8747119134516
+        - -229.3712341048974
+      -
+        - 482.17495250751216
+        - -1098.8663773063488
+      -
+        - 349.67234164333644
+        - -142.79671273136069
+      -
+        - -575.8936232050006
+        - 1052.7803829630454
+      -
+        - 973.937413786646
+        - 701.0320349503149
+      -
+        - -1084.9204888307615
+        - -512.7840997098306
+      -
+        - -1171.2743135008059
+        - 260.99134570559136
+      -
+        - 252.63769132225008
+        - 1173.1045123616923
+      -
+        - -399.63249222133487
+        - -1131.5007163766907
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 1200.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."

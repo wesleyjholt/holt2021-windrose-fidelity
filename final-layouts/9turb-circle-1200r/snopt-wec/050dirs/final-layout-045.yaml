@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 045"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 47281.81781391874
+        binned: "050"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-050dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 481.8223022827553
+        - -1099.0210503092947
+      -
+        - -396.6163414464396
+        - -1132.5614675140778
+      -
+        - 351.1087639310619
+        - -139.40087790027167
+      -
+        - 967.0056814826364
+        - 710.5631653697662
+      -
+        - -579.1675869950208
+        - 1050.9828286772174
+      -
+        - -1175.1047603534314
+        - 243.16414660616633
+      -
+        - 1180.4363893454965
+        - -215.80067356004034
+      -
+        - 250.33553253626604
+        - 1173.5979384566865
+      -
+        - -1089.5314698635204
+        - -502.9126924000197
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 1200.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."

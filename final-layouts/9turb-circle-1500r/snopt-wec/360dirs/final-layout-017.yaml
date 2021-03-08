@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 017"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 48303.10334720669
+        binned: "360"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-360dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -411.1915723372662
+        - 215.4397737612587
+      -
+        - 1458.6314131162992
+        - -349.84911394902076
+      -
+        - -591.1806974688333
+        - 1378.588185453499
+      -
+        - 509.01344154472787
+        - 1410.9944433287365
+      -
+        - -1219.1495220631518
+        - -873.884687568823
+      -
+        - -316.10348408255305
+        - -1466.3146278071538
+      -
+        - 1362.8549071206103
+        - 626.5991565286528
+      -
+        - -1473.9648078480598
+        - 278.2584202717388
+      -
+        - 717.3119007398244
+        - -1317.369969806083
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 1500.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."
