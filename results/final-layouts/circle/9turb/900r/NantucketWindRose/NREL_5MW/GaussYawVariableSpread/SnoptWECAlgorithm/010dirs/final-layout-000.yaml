@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 000"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: ""
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "gaussian"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 0.01584632332824039
+        binned: "010"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: ""
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -390.5128249723571
+        - 37.39994758884495
+      -
+        - -502.9894235850388
+        - 565.4112070783355
+      -
+        - 515.2354265954244
+        - 525.0502170534877
+      -
+        - -838.195667289724
+        - 327.76214445351565
+      -
+        - 857.5555395965649
+        - 273.12725332213125
+      -
+        - -662.556242565554
+        - -609.1134750089017
+      -
+        - 685.8968003878931
+        - -511.85530514943093
+      -
+        - -20.177217046553473
+        - 899.7737937461116
+      -
+        - 345.1837054737877
+        - -753.3914498083233
+    description: |-
+      an array of x and y-coordinates [x0, y0] 
+       [x1, y1] 
+       ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 900.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of 80.0 m."

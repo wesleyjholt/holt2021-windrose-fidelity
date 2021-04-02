@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 095"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "../data/input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "gaussian"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 48626.15388799266
+        binned: "010"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "../data/windrose-files/nantucket-windrose-ave-speeds-010dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 430.8779727576171
+        - -295.3139100476273
+      -
+        - -842.2232368561898
+        - -317.26963185827066
+      -
+        - 208.0841563332482
+        - -875.6146320631627
+      -
+        - -56.93141613790811
+        - 146.47181039790627
+      -
+        - 846.3743382268019
+        - -306.0236585482497
+      -
+        - -496.40947260246656
+        - 462.73704590616813
+      -
+        - 227.40893889729819
+        - 870.795713419621
+      -
+        - 612.033074835088
+        - 592.0762684075025
+      -
+        - -229.0530725882541
+        - -870.3646878969195
+    description: |-
+      an array of x and y-coordinates [x0, y0] 
+       [x1, y1] 
+       ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 900.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."

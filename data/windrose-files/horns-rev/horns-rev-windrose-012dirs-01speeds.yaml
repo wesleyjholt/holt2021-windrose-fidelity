@@ -1,0 +1,75 @@
+title: "Horns Rev 1 Wind Rose, 12 wind directions, 1 wind speeds"
+definitions:
+  wind_inflow:
+    properties:
+      turbulence_intensity:
+        default: 0.75
+        description: "turbulence intensity"
+      speed:
+        units: "m/s"
+        minimum: 12.5
+        frequency:
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+          -
+            - 1.0
+        bins:
+          - 12.5
+        desctiption: "wind speed frequency samples for each binned direction and wind speed"
+        maximum: 12.5
+      direction:
+        units: "deg"
+        minimum: 0.0
+        frequency:
+          - 0.04820964192838568
+          - 0.04060812162432486
+          - 0.03590718143628726
+          - 0.05271054210842168
+          - 0.09121824364872974
+          - 0.0697139427885577
+          - 0.09171834366873374
+          - 0.1184236847369474
+          - 0.124124824964993
+          - 0.11342268453690738
+          - 0.1170234046809362
+          - 0.09691938387677536
+        bins:
+          - 0.0
+          - 30.0
+          - 60.0
+          - 90.0
+          - 120.0
+          - 150.0
+          - 180.0
+          - 210.0
+          - 240.0
+          - 270.0
+          - 300.0
+          - 330.0
+        description: "The wind direction frequencies. Binned in degrees, with North as the 0."
+        maximum: 360.0
+    description: "inflow for current wind conditions"
+description: |-
+  Wind resource conditions, using direction and speed distribution from the paper by Ju Feng and Wen Zhong Shen: 
+  Modelling Wind for Wind Farm Layout Optimization Using Joint Distribution of Wind Speed and Wind Direction 
+  https://backend.orbit.dtu.dk/ws/portalfiles/portal/110639016/Modelling_Wind_for_Wind_Farm_Layout.pdf

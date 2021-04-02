@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 020"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 36591.29533803244
+        binned: "060"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-060dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - -381.1776253892781
+        - -77.70528850250457
+      -
+        - 375.67149173203603
+        - 63.417167345154894
+      -
+        - -5.696647725373803
+        - -5.264000058236081
+      -
+        - -415.53349716514725
+        - 172.7498941142556
+      -
+        - 409.24299297990797
+        - -187.14391874630522
+      -
+        - -73.22612371672192
+        - 444.02521941663144
+      -
+        - 288.5230158852513
+        - 345.34387885910814
+      -
+        - 59.31556010700462
+        - -446.0842372479736
+      -
+        - -285.48282999827103
+        - -347.85114299968865
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 450.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."

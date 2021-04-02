@@ -1,0 +1,62 @@
+title: "Optimized 9-turbine layout for a circular boundary wind farm. Layout: 006"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: "input-files/NREL5MWCPCT.txt"
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: "Bastankhah and Porté-Agel (2016)"
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: 48202.038225132914
+        binned: "100"
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: "windrose-files/nantucket-windrose-ave-speeds-100dirs.txt"
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 1381.6390184372315
+        - 584.0150884213654
+      -
+        - -99.12179597370444
+        - -1496.721376784222
+      -
+        - 1360.1949193567243
+        - -632.3525872672263
+      -
+        - -367.8255888003366
+        - 317.42638287459044
+      -
+        - -1232.9495208105989
+        - -854.3040907917873
+      -
+        - -556.2884619852717
+        - 1393.0337925534996
+      -
+        - 502.94725811297474
+        - 1413.1681020356887
+      -
+        - 481.54373308644574
+        - -673.9395787422616
+      -
+        - -1468.579705334962
+        - 305.40735264086703
+    description: |
+        an array of x and y-coordinates [x0, y0] 
+         [x1, y1] 
+         ... of wind turbine positions in cartesian coordinates
+description: "Contains optimized coordinates for 9 turbines arranged in a circular boundary wind farm with a boundary radius of 1500.0 m. The farm is centered at the coordinate (0.0, 0.0). Each turbine has a rotor diameter of [126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4, 126.4] m."
