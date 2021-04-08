@@ -237,6 +237,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
 
     if opt_algorithm.parallel_processing
 
+        println("Are we getting here?")
         # set up objective wrapper function
         @everywhere function obj_with_TI(x)
 
@@ -278,6 +279,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
 
     else
 
+        println("Or here?")
         # set up objective wrapper function
         function obj_with_TI(x)
 
