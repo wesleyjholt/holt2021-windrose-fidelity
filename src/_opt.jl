@@ -316,7 +316,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
             # return the objective as an array
             return [AEP]
         end
-
+    
     end
 
     # set up constraint wrapper function
