@@ -51,7 +51,21 @@ else
 end
 
 if _parallel_processing
+    @everywhere _ndirs = $_ndirs
+    @everywhere _nspeeds = $_nspeeds
+    @everywhere _windrose = $_windrose
+    @everywhere _turbine_type = $_turbine_type
+    @everywhere _wake_model = $_wake_model
+    @everywhere _opt_algorithm = $_opt_algorithm
+    @everywhere _opt_algorithm_arg = $_opt_algorithm_arg
+    @everywhere _boundary_shape = $_boundary_shape
+    @everywhere _boundary_input_arg = $_boundary_input_arg
     @everywhere _initial_layout_path = $_initial_layout_path
+    @everywhere _final_layout_directory_path = $_final_layout_directory_path
+    @everywhere _final_layout_file_name = $_final_layout_file_name
+    @everywhere _opt_info_directory = $_opt_info_directory
+    @everywhere _final_layout_figure_directory_path = $_final_layout_figure_directory_path
+    @everywhere _final_layout_figure_file_name = $_final_layout_figure_file_name
 end
 
 
