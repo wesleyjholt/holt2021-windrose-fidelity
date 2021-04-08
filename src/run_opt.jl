@@ -46,7 +46,7 @@ if _parallel_processing
         addprocs(SlurmManager(ntasks - 1))
     end
     @everywhere import FlowFarm; const ff = FlowFarm
-    include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
+    @everywhere include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 else
     import FlowFarm; const ff = FlowFarm
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
