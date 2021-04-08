@@ -29,9 +29,6 @@ mkpath(_final_layout_figure_directory_path)
 final_layout_path = _final_layout_directory_path * _final_layout_file_name
 final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_figure_file_name
 
-if parallel_processing
-    @everywhere _initial_layout_path = _initial_layout_path
-end
 
 #################################################################################
 # IMPORT PACKAGES AND RELEVANT FILES
@@ -53,6 +50,9 @@ else
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 end
 
+if parallel_processing
+    @everywhere _initial_layout_path = _initial_layout_path
+end
 
 
 #################################################################################
