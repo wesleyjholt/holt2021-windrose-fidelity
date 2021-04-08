@@ -235,6 +235,13 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     # DEFINE OPTIMIZATION FUNCTIONS
     #################################################################################
 
+    # if opt_algorithm.parallel_processing
+    #     using Distributed
+    #     using ClusterManagers
+    #     addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"])-1))
+    #     @everywhere import FlowFarm; const ff = FlowFarm
+    # end
+
     # set up objective wrapper function
     function obj_with_TI(x)
 
