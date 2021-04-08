@@ -17,7 +17,7 @@ for ndirs in ${ndirs_vec[@]}
 do
     for nspeeds in ${nspeeds_vec[@]}
     do
-        bash bash-files-hornsrev/run_opt_local.sh $nturbines $boundary_file_path $ndirs $nspeeds
+        sbatch bash-files-hornsrev/run_opt_local.sh $nturbines $boundary_file_path $ndirs $nspeeds
         sleep 5
     done
 done
