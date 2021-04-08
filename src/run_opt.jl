@@ -51,7 +51,7 @@ else
 end
 
 if _parallel_processing
-    @everywhere _initial_layout_path = ARGS[10]
+    @everywhere _initial_layout_path = $_initial_layout_path
 end
 
 
