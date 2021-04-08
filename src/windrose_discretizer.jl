@@ -36,6 +36,58 @@ function discretize_windrose_single_speed_fromtxt(input_filename, output_filenam
 
 end
 
+
+function resample_discretized_windrose_average_speeds(directions_orig, direction_probabilities_orig, speeds_orig, ndirs)
+
+    # create cyclical data
+    directions_orig_cyclical = [directions_orig[end-1:end] .- 360.0; directions_orig; directions_orig[1:2] .+ 360.0]
+    direction_probabilities_orig_cyclical = [direction_probabilities_orig[end-1:end]; direction_probabilities_orig; direction_probabilities_orig[1:2]]
+    speeds_orig_cyclical = [speeds_orig[end-1:end]; speeds_orig; speeds_orig[1:2]]
+
+    # get direction vector
+    directions = range(0, stop=360*(ndirs-1)/ndirs, length=ndirs)
+
+    # use akima spline to interpolate the pmf to the specified number of wind directions
+    direction_probabilities = akima(directions_orig_cyclical, direction_probabilities_orig_cyclical, directions)
+    direction_probabilities /= sum(direction_probabilities)
+
+    # use akima spline to interpolate speeds
+    speeds = akima(directions_orig_cyclical, speeds_cyclical, directions)
+
+    return directions, direction_probabilities, speeds
+end
+
+
+function resample_discretized_windrose_average_speeds_weibull(directions_orig, direction_probabilities_orig, speed_weibull_params_orig, ndirs)
+
+    # create cyclical data
+    directions_orig_cyclical = [directions_orig[end-1:end] .- 360.0; directions_orig; directions_orig[1:2] .+ 360.0]
+    direction_probabilities_orig_cyclical = [direction_probabilities_orig[end-1:end]; direction_probabilities_orig; direction_probabilities_orig[1:2]]
+    speed_weibull_params_orig_cyclical = [speed_weibull_params_orig[end-1:end,:]; speed_weibull_params_orig; speed_weibull_params_orig[1:2,:]]
+
+    # get direction vector
+    directions = range(0, stop=360*(ndirs-1)/ndirs, length=ndirs)
+
+    # use akima spline to interpolate the direction probabilities and normalize the interpolated probabilities to make them an actual probability mass function 
+    direction_probabilities = akima(directions_orig_cyclical, direction_probabilities_orig_cyclical, directions)
+    direction_probabilities /= sum(direction_probabilities)
+
+    # use akima spline to interpolate the speed weibull parameters to the specified number of wind directions
+    speed_weibull_params = zeros(ndirs, 2)
+    speed_weibull_params[:,1] = akima(directions_orig_cyclical, speed_weibull_params_orig_cyclical[:,1], directions)
+    speed_weibull_params[:,2] = akima(directions_orig_cyclical, speed_weibull_params_orig_cyclical[:,2], directions)
+
+    # get average speeds
+    average_speeds = zeros(ndirs)
+    speed_integration_bin_edges = range(0.0, stop=30.0, step=0.1)
+    for i = 1:ndirs
+        dist = Weibull(speed_weibull_params[i,:]...)
+        average_speeds = trapz(speed_integration_bin_edges, pdf.(dist, speed_integration_bin_edges))
+    end
+
+    return directions, direction_probabilities, average_speeds
+end
+
 function resample_discretized_windrose_multiple_speeds_weibull(directions_orig, direction_probabilities_orig, speed_weibull_params_orig, ndirs, nspeeds)
 
     # create cyclical data
@@ -68,7 +120,6 @@ function resample_discretized_windrose_multiple_speeds_weibull(directions_orig, 
     end
 
     return directions, direction_probabilities, speeds, speed_probabilities
-
 end
 
 function write_windrose_yaml(output_windrose_filepath, directions, direction_probabilities, speeds, speed_probabilities, turbulence_intensity; title="", description="", template_file = "../data/windrose-files/windrose-template.yaml")
