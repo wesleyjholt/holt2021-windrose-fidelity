@@ -416,7 +416,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     cd(opt_info_directory)
     
     # run WEC optimizations
-    for i = 1:length(opt_algorithm.wec) 
+    for i = 1:length(opt_algorithm.wec)
 
         # set WEC value and strings for file paths
         if opt_algorithm.withTI[i]
@@ -436,6 +436,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
         options["Major optimality tolerance"] = opt_algorithm.tol[i]
 
         # call Snopt
+        println("Did we get the Snopt?")
         if opt_algorithm.withTI[i]
             xopt_all[:,i+1], fopt, info = snopt(wind_farm_opt_with_TI, x, lb, ub, options) 
         else

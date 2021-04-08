@@ -41,7 +41,6 @@ using PyPlot
 import ForwardDiff
 
 if _parallel_processing
-    println(ENV["SLURM_NTASKS"])
     addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"])-1))
     @everywhere import FlowFarm; const ff=FlowFarm
     @everywhere include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
@@ -110,8 +109,9 @@ eval(Meta.parse("farm_boundary = $(_boundary_shape)($(_boundary_input_arg))"))
 #################################################################################
 # RUN OPTIMIZATION
 #################################################################################
+println("Did we get here?")
 turbine_x_opt, turbine_y_opt = optimize_farm_layout(final_layout_path, _opt_info_directory, layout_param, model_param, opt_algorithm, farm_boundary)
-
+println("How abount here?")
 
 #################################################################################
 # PLOT LAYOUT
