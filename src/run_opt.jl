@@ -33,6 +33,7 @@ _final_layout_file_name = ARGS[12]
 _opt_info_directory = ARGS[13]
 _final_layout_figure_directory_path = ARGS[14]
 _final_layout_figure_file_name = ARGS[15]
+_parallel_processing = parse(Bool, ARGS[16])
 
 # create the desired file paths
 mkpath(_final_layout_directory_path)

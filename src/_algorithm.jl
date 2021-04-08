@@ -20,9 +20,10 @@ struct SnoptWECAlgorithm{AF, AB, F, I, B} <: OptAlgorithm
     withTI::AB
     maxiter::I
     checkgradients::B
+    parallel_processing::B
 end
-SnoptWECAlgorithm() = SnoptWECAlgorithm(1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [1e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6, 1e-6], [false, false, false, false, false, false, true], Int(1e6), true)
-SnoptWECAlgorithm(a::Float64) = SnoptWECAlgorithm(a, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [1e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6, 1e-6], [false, false, false, false, false, false, true], Int(1e6), true)
+SnoptWECAlgorithm() = SnoptWECAlgorithm(1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [1e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6, 1e-6], [false, false, false, false, false, false, true], Int(1e6), true, false)
+SnoptWECAlgorithm(a::Float64) = SnoptWECAlgorithm(a, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [1e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6, 1e-6], [false, false, false, false, false, false, true], Int(1e6), true, false)
 
 
 """
