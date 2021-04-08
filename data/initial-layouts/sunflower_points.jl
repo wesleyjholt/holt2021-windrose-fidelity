@@ -106,7 +106,7 @@ end
 
 
 turbine_spacing = 5
-nturbines = 36
+nturbines = 4
 rotor_diameter = 126.4
 circle_boundary_radius = calc_circle_boundary_radius(turbine_spacing, nturbines, rotor_diameter, 2)
 
@@ -120,4 +120,7 @@ xlim([-circle_boundary_radius*1.3, circle_boundary_radius*1.3])
 ylim([-circle_boundary_radius*1.3, circle_boundary_radius*1.3])
 
 
-calc_square_boundary_length(5, 16, 126.4)
+square_boundary_length = calc_square_boundary_length(turbine_spacing, nturbines, rotor_diameter)
+
+println("Area of circular boundary is: ", pi*circle_boundary_radius^2)
+println("Area of square baoundary is: ", square_boundary_length^2)
