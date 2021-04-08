@@ -392,7 +392,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     xopt_all[:,1] = x
 
     # report initial objective value
-    initial_aep, _, _, _, _ = wind_farm_opt_with_TI(x)[
+    initial_aep, _, _, _, _ = wind_farm_opt_with_TI(x)
     println("starting objective value: ", initial_aep, "\n")
 
     # set up options for SNOPT
@@ -436,7 +436,6 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
         options["Major optimality tolerance"] = opt_algorithm.tol[i]
 
         # call Snopt
-        println("Did we get the Snopt?")
         if opt_algorithm.withTI[i]
             xopt_all[:,i+1], fopt, info = snopt(wind_farm_opt_with_TI, x, lb, ub, options) 
         else
@@ -455,7 +454,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     #################################################################################
 
     # print optimization results
-    final_aep, _, _, _, _ = wind_farm_opt_with_TI(xopt_all[:,end])[1]
+    final_aep, _, _, _, _ = wind_farm_opt_with_TI(xopt_all[:,end])
     println("end objective value: ", final_aep, "\n")
 
     # # save WEC layout history to txt file
