@@ -50,7 +50,7 @@ else
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 end
 
-if parallel_processing
+if _parallel_processing
     @everywhere _initial_layout_path = _initial_layout_path
 end
 
