@@ -5,8 +5,8 @@
 #SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
-#SBATCH --mail-type=BEGIN
-#SBATCH --mail-type=END
+# #SBATCH --mail-type=BEGIN
+# #SBATCH --mail-type=END
 #SBATCH --array=1-3    # job array number corresponds to the layout numbers
 #SBATCH --qos=test
 
