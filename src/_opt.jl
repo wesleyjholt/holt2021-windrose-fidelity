@@ -372,6 +372,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     end
 
 
+    display(obj_with_TI)
     #################################################################################
     # SET OPTIMIZATION PARAMETERS
     #################################################################################
