@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#SBATCH --ntasks=1
+#SBATCH --ntasks=4
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
 #SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
@@ -23,7 +23,7 @@ windrose=HornsRevWindRose
 turbine_type=VestasV80_2MW
 wake_model=GaussYawVariableSpread
 opt_algorithm=SnoptWECAlgorithm
-opt_algorithm_arg="1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [5e-1, 1e-1, 1e-1, 1e-1, 1e-2, 1e-2, 1e-3], [false, false, false, false, false, false, true], Int(1e3), true, false"
+opt_algorithm_arg="1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [5e-1, 1e-1, 1e-1, 1e-1, 1e-2, 1e-2, 1e-3], [false, false, false, false, false, false, true], Int(1e3), true"
 boundary_shape=FreeFormBoundary
 
 # These are the file paths for the input and output info.
@@ -37,4 +37,20 @@ parallel_processing=true
 
 # Now, we run the optimization.
 module load julia/1.4
-julia run_opt.jl $ndirs $nspeeds $windrose $turbine_type $wake_model $opt_algorithm "$opt_algorithm_arg" $boundary_shape $boundary_input_arg $initial_layout_path $final_layout_directory_path $final_layout_file_name $opt_info_directory $final_layout_figure_directory_path $final_layout_figure_file_name $parallel_processing
+julia run_opt.jl \
+$ndirs \
+$nspeeds \
+$windrose \
+$turbine_type \
+$wake_model \
+$opt_algorithm \
+"$opt_algorithm_arg" \
+$boundary_shape \
+$boundary_input_arg \
+$initial_layout_path \
+$final_layout_directory_path \
+$final_layout_file_name \
+$opt_info_directory \
+$final_layout_figure_directory_path \
+$final_layout_figure_file_name \
+$parallel_processing

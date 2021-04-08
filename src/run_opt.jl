@@ -1,16 +1,4 @@
 #################################################################################
-# IMPORT PACKAGES AND RELEVANT FILES
-#################################################################################
-import FlowFarm; const ff=FlowFarm
-using Snopt
-using DelimitedFiles 
-using PyPlot
-import ForwardDiff
-
-include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
-
-
-#################################################################################
 # GET INPUT ARGUMENTS
 #################################################################################
 _ndirs = parse(Int64, ARGS[1])
@@ -43,22 +31,54 @@ final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_f
 
 
 #################################################################################
+# IMPORT PACKAGES AND RELEVANT FILES
+#################################################################################
+if _parallel_processing
+    using Distributed
+    using ClusterManagers
+    addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"])-1))
+    @everywhere import FlowFarm; const ff=FlowFarm
+    @everywhere include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
+else
+    import FlowFarm; const ff=FlowFarm
+    include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
+end
+
+using Snopt
+using DelimitedFiles 
+using PyPlot
+import ForwardDiff
+
+
+#################################################################################
 # SET LAYOUT PARAMETERS
 #################################################################################
-layout_param = layout_set(_initial_layout_path)
-nturbines = length(layout_param.turbine_x)
-
+if _parallel_processing
+    @everywhere layout_param = layout_set(_initial_layout_path)
+    @everywhere nturbines = length(layout_param.turbine_x)
+else
+    layout_param = layout_set(_initial_layout_path)
+    nturbines = length(layout_param.turbine_x)
+end
 
 #################################################################################
 # SET MODEL PARAMETERS
 #################################################################################
-model_param = model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _nspeeds)
+if _parallel_processing
+    @everywhere model_param = model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _nspeeds)
+else
+    model_param = model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _nspeeds)
+end
 
 
 #################################################################################
 # SET OPTIMIZATION ALGORITHM
 #################################################################################
-eval(Meta.parse("opt_algorithm = $(_opt_algorithm)($_opt_algorithm_arg)"))
+if _parallel_processing
+    @everywhere eval(Meta.parse("opt_algorithm = $(_opt_algorithm)($_opt_algorithm_arg, $_parallel_processing)"))
+else
+    eval(Meta.parse("opt_algorithm = $(_opt_algorithm)($_opt_algorithm_arg, $_parallel_processing)"))
+end
 
 
 #################################################################################

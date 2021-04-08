@@ -235,50 +235,88 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     # DEFINE OPTIMIZATION FUNCTIONS
     #################################################################################
 
-    # if opt_algorithm.parallel_processing
-    #     using Distributed
-    #     using ClusterManagers
-    #     addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"])-1))
-    #     @everywhere import FlowFarm; const ff = FlowFarm
-    # end
+    if opt_algorithm.parallel_processing
 
-    # set up objective wrapper function
-    function obj_with_TI(x)
+        # set up objective wrapper function
+        @everywhere function obj_with_TI(x)
 
-        # get number of turbines
-        nturbines = Int(length(x)/2)
+            # get number of turbines
+            nturbines = Int(length(x)/2)
 
-        # extract x and y locations of turbines from design variables vector
-        turbine_x = x[1:nturbines] 
-        turbine_y = x[nturbines+1:end]
+            # extract x and y locations of turbines from design variables vector
+            turbine_x = x[1:nturbines] 
+            turbine_y = x[nturbines+1:end]
 
-        # calculate AEP
-        AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
-                    model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
-                    model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
-                    rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
-        
-        # return the objective as an array
-        return [AEP]
-    end
+            # calculate AEP
+            AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                        model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                        model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                        rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            
+            # return the objective as an array
+            return [AEP]
+        end
 
-    function obj_no_TI(x)
+        @everywhere function obj_no_TI(x)
 
-        # get number of turbines
-        nturbines = Int(length(x)/2)
+            # get number of turbines
+            nturbines = Int(length(x)/2)
 
-        # extract x and y locations of turbines from design variables vector
-        turbine_x = x[1:nturbines] 
-        turbine_y = x[nturbines+1:end]
+            # extract x and y locations of turbines from design variables vector
+            turbine_x = x[1:nturbines] 
+            turbine_y = x[nturbines+1:end]
 
-        # calculate AEP
-        AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
-                    model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
-                    model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_no_ti,
-                    rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            # calculate AEP
+            AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                        model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                        model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_no_ti,
+                        rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
 
-        # return the objective as an array
-        return [AEP]
+            # return the objective as an array
+            return [AEP]
+        end
+
+    else
+
+        # set up objective wrapper function
+        function obj_with_TI(x)
+
+            # get number of turbines
+            nturbines = Int(length(x)/2)
+
+            # extract x and y locations of turbines from design variables vector
+            turbine_x = x[1:nturbines] 
+            turbine_y = x[nturbines+1:end]
+
+            # calculate AEP
+            AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                        model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                        model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                        rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            
+            # return the objective as an array
+            return [AEP]
+        end
+
+        function obj_no_TI(x)
+
+            # get number of turbines
+            nturbines = Int(length(x)/2)
+
+            # extract x and y locations of turbines from design variables vector
+            turbine_x = x[1:nturbines] 
+            turbine_y = x[nturbines+1:end]
+
+            # calculate AEP
+            AEP = opt_algorithm.objscale*ff.calculate_aep(turbine_x, turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                        model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                        model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_no_ti,
+                        rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+
+            # return the objective as an array
+            return [AEP]
+        end
+
     end
 
     # set up constraint wrapper function
