@@ -11,24 +11,23 @@ SLURM_ARRAY_TASK_ID=98
 layout_number=$(printf %3s $SLURM_ARRAY_TASK_ID | tr ' ' 0)
 nturbines=$1
 boundary_input_arg=$2
-boundary_radius=$boundary_input_arg
 ndirs=$(printf %3s $3 | tr ' ' 0)
 nspeeds=$(printf %2s $4 | tr ' ' 0)
 
 # These variables stay constant for each optimization.
-wake_model=GaussYawVariableSpread
+windrose=HornsRevWindRose
 turbine_type=VestasV80_2MW
-windrose=NantucketWindRose
+wake_model=GaussYawVariableSpread
 opt_algorithm=SnoptWECAlgorithm
-opt_algorithm_arg=" "
-boundary_shape=CircleBoundary
+opt_algorithm_arg="1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [3.5e-1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-5], [false, false, false, false, false, false, true], Int(1e6), true"
+boundary_shape=FreeFormBoundary
 
 # These are the file paths for the input and output info.
-initial_layout_path="../data/initial-layouts/circle/${nturbines}turb/${boundary_radius}r/initial-layout-${layout_number}.txt"
-final_layout_directory_path="../results/final-layouts/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/"
+initial_layout_path="../data/initial-layouts/horns-rev/initial-layout-${layout_number}.txt"
+final_layout_directory_path="../results/final-layouts/horns-rev/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/"
 final_layout_file_name="final-layout-${layout_number}.yaml"
-opt_info_directory="../results/opt-info/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/layout-${layout_number}/"
-final_layout_figure_directory_path="../results/figures/final-layouts/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/"
+opt_info_directory="../results/opt-info/horns-rev/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/layout-${layout_number}/"
+final_layout_figure_directory_path="../results/figures/final-layouts/horns-rev/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/"
 final_layout_figure_file_name="final-layout-${layout_number}.png"
 
 # Now, we run the optimization.

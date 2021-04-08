@@ -1,11 +1,11 @@
 #!/bin/sh
 
-nturbine_vec=(9 18)
+nturbines_vec=(9 18)
 boundary_radius_vec=(450 600 900 1200 1500)
 ndirs_vec=(10 20 30 40 50 60 70 80 90 100 120 150 200 360)
 nspeeds_vec=(1)
 
-for nturbines in ${nturbine_vec[@]}
+for nturbines in ${nturbines_vec[@]}
 do
     for boundary_radius in ${boundary_radius_vec[@]}
     do
