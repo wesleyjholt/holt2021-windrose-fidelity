@@ -235,7 +235,7 @@ function optimize_farm_layout(final_layout_path, opt_info_directory, layout_para
     # DEFINE OPTIMIZATION FUNCTIONS
     #################################################################################
 
-    if opt_algorithm.parallel_processing
+    if !opt_algorithm.parallel_processing
 
         println("Are we getting here?")
         # set up objective wrapper function
