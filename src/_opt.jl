@@ -259,7 +259,7 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
     options["Derivative option"] = 1
     options["Major iteration limit"] = opt_algorithm.maxiter
     if opt_algorithm.checkgradients
-        options["Verify level"] = -1#3
+        options["Verify level"] = 3
     else
         options["Verify level"] = -1
     end
