@@ -29,6 +29,9 @@ mkpath(_final_layout_figure_directory_path)
 final_layout_path = _final_layout_directory_path * _final_layout_file_name
 final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_figure_file_name
 
+if parallel_processing
+    @everywhere _initial_layout_path = _initial_layout_path
+end
 
 #################################################################################
 # IMPORT PACKAGES AND RELEVANT FILES
