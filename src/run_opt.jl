@@ -66,6 +66,7 @@ if _parallel_processing
     @everywhere _opt_info_directory = $_opt_info_directory
     @everywhere _final_layout_figure_directory_path = $_final_layout_figure_directory_path
     @everywhere _final_layout_figure_file_name = $_final_layout_figure_file_name
+    @everywhere _parallel_processing = $_parallel_processing
 end
 
 
