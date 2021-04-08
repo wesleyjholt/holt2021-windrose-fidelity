@@ -2,13 +2,13 @@
 
 #SBATCH --ntasks=4
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
-#SBATCH --time=00:05:00 # walltime
+#SBATCH --time=01:00:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
-#SBATCH --array=1-3    # job array number corresponds to the layout numbers
-#SBATCH --qos=test
+#SBATCH --array=2-5    # job array number corresponds to the layout numbers
+# #SBATCH --qos=test
 
 
 # The values for these variables are pulled from the input arguments (from the "submit" file).
