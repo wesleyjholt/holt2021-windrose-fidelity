@@ -33,9 +33,14 @@ final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_f
 #################################################################################
 # IMPORT PACKAGES AND RELEVANT FILES
 #################################################################################
+using Distributed
+using ClusterManagers
+using Snopt
+using DelimitedFiles 
+using PyPlot
+import ForwardDiff
+
 if _parallel_processing
-    using Distributed
-    using ClusterManagers
     println(ENV["SLURM_NTASKS"])
     addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"])-1))
     @everywhere import FlowFarm; const ff=FlowFarm
@@ -45,10 +50,6 @@ else
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 end
 
-using Snopt
-using DelimitedFiles 
-using PyPlot
-import ForwardDiff
 
 
 #################################################################################
