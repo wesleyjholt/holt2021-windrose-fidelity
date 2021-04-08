@@ -2,13 +2,13 @@
 
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
-#SBATCH --time=03:00:00 # walltime
+#SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
 #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 #SBATCH --mail-type=BEGIN
 #SBATCH --mail-type=END
 #SBATCH --array=1-3    # job array number corresponds to the layout numbers
-# #SBATCH --qos=test
+#SBATCH --qos=test
 
 
 # The values for these variables are pulled from the input arguments (from the "submit" file).
@@ -36,4 +36,5 @@ final_layout_figure_file_name="final-layout-${layout_number}.png"
 parallel_processing=true
 
 # Now, we run the optimization.
+module load julia/1.4
 julia run_opt.jl $ndirs $nspeeds $windrose $turbine_type $wake_model $opt_algorithm "$opt_algorithm_arg" $boundary_shape $boundary_input_arg $initial_layout_path $final_layout_directory_path $final_layout_file_name $opt_info_directory $final_layout_figure_directory_path $final_layout_figure_file_name $parallel_processing
