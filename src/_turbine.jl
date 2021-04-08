@@ -66,8 +66,15 @@ end
 NoYaw(n::Int64) = NoYaw(0.0 .+ zeros(n))
 
 
+"""
+    get_turbine_power_thrust_models(turbine_design::VestasV80_2MW)
 
-function get_turbine_power_thrust_models(turbine_design::VestasV80_2MW, nturbines)
+Creates power and thrust models (used by FlowFarm) for the Vestas V80 2MW turbine.
+
+# Arguments
+- `turbine_design::VestasV80_2MW`: Container holding design parameters for the Vestas V80 2MW turbine
+"""
+function get_turbine_power_thrust_models(turbine_design::VestasV80_2MW)
 
     # get number of turbines
     nturbines = length(turbine_design.hub_height)
@@ -97,8 +104,15 @@ function get_turbine_power_thrust_models(turbine_design::VestasV80_2MW, nturbine
     return turbine_power_model, turbine_ct_model
 end
 
+"""
+    get_turbine_power_thrust_models(turbine_design::NREL_5MW)
 
-function get_turbine_power_thrust_models(turbine_design::NREL_5MW, nturbines)
+Creates power and thrust models (used by FlowFarm) for the NREL 5MW reference turbine.
+
+# Arguments
+- `turbine_design::NREL_5MW`: Container holding design parameters for the NREL 5MW reference turbine
+"""
+function get_turbine_power_thrust_models(turbine_design::NREL_5MW)
 
     # get number of turbines
     nturbines = length(turbine_design.hub_height)

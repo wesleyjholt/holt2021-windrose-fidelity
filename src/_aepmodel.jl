@@ -1,3 +1,18 @@
+"""
+    ModelParamSet(velocity_sampling, farm_model_with_ti, farm_model_no_ti, turbine_design, turbine_op, turbine_power_models, turbine_ct_models, wind_resource_model)
+
+Container holding all parameters for the wind farm analysis model.
+
+# Arguments
+- `velocity_sampling::RotorSampling`: Container holding rotor sampling points
+- `farm_model_with_ti::WindFarmModelSet`: FlowFarm container for objects defining models to use in wind farm calculations (with turbulence intensity)
+- `farm_model_no_ti::WindFarmModelSet`: FlowFarm container for objects defining models to use in wind farm calculations (without turbulence intensity)
+- `turbine_design::TurbineType`: Container holding design parameters for the turbines
+- `turbine_op`: Container holding parameters for the operating state of the turbines
+- `turbine_power_models::AbstractPowerModel`: FlowFarm container holding the power models for each turbine
+- `turbine_ct_models::AbstractThrustCoefficientModel`: Flowfarm container holding the thrust coefficient models for each turbine
+- `wind_resource_model::AbstractWindResourceModel`: Flowfarm container holding the wind resource model
+"""
 struct ModelParamSet{VS, FMWTI, FMNTI, TD, TO, TPM, TCM, WRM}
     # farm parameters and models
     velocity_sampling::VS
@@ -14,7 +29,19 @@ struct ModelParamSet{VS, FMWTI, FMNTI, TD, TO, TPM, TCM, WRM}
     wind_resource_model::WRM
 end
 
+"""
+    model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _nspeeds)
 
+Creates a ModelParamSet container that holds all parameters for the wind farm analysis model.
+
+# Arguments
+- `_wake_model::String`: name of the wake model
+- `_turbine_type::String`: name of turbine type
+- `nturbines::Int64`: number of turbines in the farm
+- `_windrose::String`: name of wind rose
+- `_ndirs::Int64`: number of directions in the wind rose
+- `_nspeeds::Int64`: number of speeds in the wind rose
+"""
 function model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _nspeeds)
         
     #################################################################################
@@ -51,7 +78,7 @@ function model_set(_wake_model, _turbine_type, nturbines, _windrose, _ndirs, _ns
     turbine_op = NoYaw(nturbines)
 
     # get turbine power and thrust models
-    turbine_power_model, turbine_ct_model = get_turbine_power_thrust_models(turbine_design, nturbines)
+    turbine_power_model, turbine_ct_model = get_turbine_power_thrust_models(turbine_design)
 
 
     #################################################################################
