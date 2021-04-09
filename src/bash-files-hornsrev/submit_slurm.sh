@@ -18,12 +18,10 @@ for ndirs in ${ndirs_vec[@]}
 do
     for nspeeds in ${nspeeds_vec[@]}
     do
-        echo $ndirs
-        echo $nspeeds
-        expr $ndirs \* $nspeeds
         ntasksdefault=$(expr $ndirs \* $nspeeds / 5)
-        echo $ntasksdefault
-        sbatch --ntasks=$(($ntasksdefault<$ntasksmax ? $ntasksdefault : $ntasksmax)) bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
-        sleep 5
+        _ntasks=$(($ntasksdefault<$ntasksmax ? $ntasksdefault : $ntasksmax))
+        echo "Now submitting jobs for $ndirs directions and $nspeeds speeds, using $_ntasks CPUs."
+        sbatch --ntasks=_ntasks bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
+        sleep 1
     done
 done
