@@ -1,7 +1,6 @@
 #!/bin/sh
 
-n_tasks=5
-#SBATCH --ntasks=$n_tasks
+# #SBATCH --ntasks=4
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
 #SBATCH --time=02:00:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'

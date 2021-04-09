@@ -17,7 +17,7 @@ for ndirs in ${ndirs_vec[@]}
 do
     for nspeeds in ${nspeeds_vec[@]}
     do
-        sbatch bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
+        sbatch --ntasks=5 bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
         sleep 5
     done
 done
