@@ -252,7 +252,7 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
 
     # report initial objective value
     initial_aep, _, _, _, _ = wind_farm_opt_with_TI(x)
-    println("starting objective value: ", initial_aep, "\n")
+    println("starting objective value: ", -initial_aep*1e-6/opt_algorithm.objscale, " MWh\n")
 
     # set up options for SNOPT
     options = Dict{String, Any}()
@@ -314,7 +314,7 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
 
     # print optimization results
     final_aep, _, _, _, _ = wind_farm_opt_with_TI(xopt_all[:,end])
-    println("end objective value: ", final_aep, "\n")
+    println("end objective value: ", -final_aep*1e-6/opt_algorithm.objscale, " MWh\n")
 
     # # save WEC layout history to txt file
     # open("../results/final-layouts/" * main_file_path * "final-layout-wec-history-$(layout_number_string).txt", "w") do io
