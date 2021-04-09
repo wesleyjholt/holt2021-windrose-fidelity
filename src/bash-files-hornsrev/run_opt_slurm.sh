@@ -6,8 +6,8 @@
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
-#SBATCH --array=31-34    # job array number corresponds to the layout numbers
-# #SBATCH --qos=test
+#SBATCH --array=35-40    # job array number corresponds to the layout numbers
+#SBATCH --qos=test
 
 
 # The values for these variables are pulled from the input arguments (from the "submit" file).
