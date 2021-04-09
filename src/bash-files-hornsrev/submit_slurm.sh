@@ -18,6 +18,8 @@ for ndirs in ${ndirs_vec[@]}
 do
     for nspeeds in ${nspeeds_vec[@]}
     do
+        echo $ndirs
+        echo $nspeeds
         ntasksdefault=$(expr $ndirs \* $nspeeds / 5)
         echo $ntasksdefault
         sbatch --ntasks=$(($ntasksdefault<$ntasksmax ? $ntasksdefault : $ntasksmax)) bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
