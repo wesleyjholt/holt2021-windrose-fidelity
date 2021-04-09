@@ -1,8 +1,9 @@
 #!/bin/sh
 
-#SBATCH --ntasks=4
+n_tasks=5
+#SBATCH --ntasks=$n_tasks
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
-#SBATCH --time=01:00:00 # walltime
+#SBATCH --time=02:00:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
@@ -23,7 +24,7 @@ windrose=HornsRevWindRose
 turbine_type=VestasV80_2MW
 wake_model=GaussYawVariableSpread
 opt_algorithm=SnoptWECAlgorithm
-opt_algorithm_arg="1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [5e-1, 1e-1, 1e-1, 1e-1, 1e-2, 1e-2, 1e-3], [false, false, false, false, false, false, true], Int(1e3), true"
+opt_algorithm_arg="1e-7, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [3e-1, 1e-1, 1e-1, 1e-1, 1e-2, 1e-2, 1e-3], [false, false, false, false, false, false, true], Int(1e5), true"
 boundary_shape=FreeFormBoundary
 
 # These are the file paths for the input and output info.
