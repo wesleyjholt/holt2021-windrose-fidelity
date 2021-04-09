@@ -7,5 +7,5 @@
 #SBATCH --array=1-5    # job array number corresponds to the layout numbers
 # #SBATCH --qos=test
 
-module load julia/1.4
+module load julia
 julia test_aepcalc.jl

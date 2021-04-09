@@ -1,13 +1,15 @@
+# import packages for distributed processing
 using Distributed
 using ClusterManagers
 
+# add processors
 addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"]) - 1))
 
+# import FlowFarm and model set file to all processors
 clk1 = time()
 @everywhere using FlowFarm; const ff = FlowFarm
 @everywhere include("model_set_7_ieacs4_reduced_wind_rose.jl")
 clk2 = time()
-
 println("Imported Flowfarm and set up models in $(round(clk2-clk1, digits=3)) seconds.")
 
 # calculate AEP
