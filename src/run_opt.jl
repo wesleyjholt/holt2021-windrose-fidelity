@@ -25,12 +25,12 @@ _parallel_processing = parse(Bool, ARGS[16])
 
 # create the desired file paths
 loop_counter = 1
-while !isdir(_final_layout_directory_path) && counter < 100
+while !isdir(_final_layout_directory_path) && loop_counter < 100
     try mkpath(_final_layout_directory_path); catch; end
     global loop_counter += 1 
 end
 loop_counter = 1
-while !isdir(_final_layout_figure_directory_path) && counter < 100
+while !isdir(_final_layout_figure_directory_path) && loop_counter < 100
     try mkpath(_final_layout_figure_directory_path); catch; end
     global loop_counter += 1 
 end
