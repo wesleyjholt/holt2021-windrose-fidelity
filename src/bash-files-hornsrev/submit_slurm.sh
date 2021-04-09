@@ -9,15 +9,17 @@
 # set variable values
 nturbines=80
 boundary_file_path="../data/input-files/horns-rev-boundary.txt"
-ndirs_vec=(12)
-nspeeds_vec=(1)
+ndirs_vec=(12, 36)
+nspeeds_vec=(1, 2)
+ntasksmax=50
 
 # run optimizations for each combination of variables
 for ndirs in ${ndirs_vec[@]}
 do
     for nspeeds in ${nspeeds_vec[@]}
     do
-        sbatch --ntasks=5 bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
+        ntasksdefault=$(expr $ndirs \* $nspeeds / 5)
+        sbatch --ntasks=$(($ntasksdefault<$ntasksmax ? $ntasksdefault : $ntasksmax)) bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
         sleep 5
     done
 done
