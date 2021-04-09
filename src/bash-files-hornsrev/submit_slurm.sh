@@ -21,7 +21,7 @@ do
         ntasksdefault=$(expr $ndirs \* $nspeeds / 5)
         _ntasks=$(($ntasksdefault<$ntasksmax ? $ntasksdefault : $ntasksmax))
         echo "Now submitting jobs for $ndirs directions and $nspeeds speeds, using $_ntasks CPUs."
-        sbatch --ntasks=_ntasks bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
+        sbatch --ntasks=$_ntasks bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
         sleep 1
     done
 done
