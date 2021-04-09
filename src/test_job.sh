@@ -1,3 +1,5 @@
+#!/bin/sh
+
 #SBATCH --ntasks=20
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
 #SBATCH --time=00:05:00 # walltime
