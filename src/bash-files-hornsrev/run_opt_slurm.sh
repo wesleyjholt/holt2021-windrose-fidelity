@@ -6,12 +6,13 @@
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
-#SBATCH --array=35-36    # job array number corresponds to the layout numbers
+# #SBATCH --array=35-36    # job array number corresponds to the layout numbers
 #SBATCH --qos=test
 
-
+# $SLURM_ARRAY_TASK_ID
+layout_number=51
 # The values for these variables are pulled from the input arguments (from the "submit" file).
-layout_number=$(printf %3s $SLURM_ARRAY_TASK_ID | tr ' ' 0)
+layout_number=$(printf %3s $layout_number | tr ' ' 0)
 nturbines=$1
 boundary_input_arg=$2
 ndirs=$(printf %3s $3 | tr ' ' 0)
