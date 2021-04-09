@@ -24,8 +24,8 @@ _final_layout_figure_file_name = ARGS[15]
 _parallel_processing = parse(Bool, ARGS[16])
 
 # create the desired file paths
-mkpath(_final_layout_directory_path)
-mkpath(_final_layout_figure_directory_path)
+try mkpath(_final_layout_directory_path); catch; end
+try mkpath(_final_layout_figure_directory_path); catch; end
 final_layout_path = _final_layout_directory_path * _final_layout_file_name
 final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_figure_file_name
 

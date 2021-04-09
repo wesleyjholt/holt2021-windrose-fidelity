@@ -6,7 +6,7 @@
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
-#SBATCH --array=6-10    # job array number corresponds to the layout numbers
+#SBATCH --array=11-15    # job array number corresponds to the layout numbers
 # #SBATCH --qos=test
 
 
