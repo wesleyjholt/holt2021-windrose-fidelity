@@ -7,7 +7,7 @@
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
 #SBATCH --array=51-52    # job array number corresponds to the layout numbers
-#SBATCH --qos=test
+# #SBATCH --qos=test
 
 
 # The values for these variables are pulled from the input arguments (from the "submit" file).
