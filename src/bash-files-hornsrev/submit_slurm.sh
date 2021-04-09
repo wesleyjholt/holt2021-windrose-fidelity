@@ -23,6 +23,6 @@ do
         _ntasks=$(($_ntasks>1 ? $_ntasks : 1))
         echo "Now submitting jobs for $ndirs directions and $nspeeds speeds, using $_ntasks CPUs."
         sbatch --ntasks=$_ntasks bash-files-hornsrev/run_opt_slurm.sh $nturbines $boundary_file_path $ndirs $nspeeds
-        sleep 5
+        sleep 3
     done
 done

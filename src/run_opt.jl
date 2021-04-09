@@ -24,15 +24,15 @@ _final_layout_figure_file_name = ARGS[15]
 _parallel_processing = parse(Bool, ARGS[16])
 
 # create the desired file paths
-counter = 1
+loop_counter = 1
 while !isdir(_final_layout_directory_path) && counter < 100
     try mkpath(_final_layout_directory_path); catch; end
-    counter += 1 
+    global loop_counter += 1 
 end
-counter = 1
+loop_counter = 1
 while !isdir(_final_layout_figure_directory_path) && counter < 100
     try mkpath(_final_layout_figure_directory_path); catch; end
-    counter += 1 
+    global loop_counter += 1 
 end
 final_layout_path = _final_layout_directory_path * _final_layout_file_name
 final_layout_figure_path = _final_layout_figure_directory_path * _final_layout_figure_file_name
