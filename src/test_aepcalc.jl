@@ -1,6 +1,8 @@
 using Distributed
 using ClusterManagers
 
+addprocs(SlurmManager(parse(Int, ENV["SLURM_NTASKS"]) - 1))
+
 clk1 = time()
 @everywhere using FlowFarm; const ff = FlowFarm
 @everywhere include("model_set_7_ieacs4_reduced_wind_rose.jl")
