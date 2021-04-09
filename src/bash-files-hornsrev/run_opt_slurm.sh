@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
-#SBATCH --time=04:00:00 # walltime
+#SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN

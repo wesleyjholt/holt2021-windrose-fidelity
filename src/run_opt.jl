@@ -49,9 +49,12 @@ using PyPlot
 import ForwardDiff
 
 ntasks = parse(Int, ENV["SLURM_NTASKS"])
+println("Using $ntasks processors.")
 if _parallel_processing
     if ntasks > 1
+        println("We got to the if statement.")
         addprocs(SlurmManager(ntasks - 1))
+        println("We added the processors.")
     end
     @everywhere import FlowFarm; const ff = FlowFarm
     @everywhere include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
@@ -59,7 +62,7 @@ else
     import FlowFarm; const ff = FlowFarm
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 end
-
+println("Packages are imported.")
 
 
 # if _parallel_processing
