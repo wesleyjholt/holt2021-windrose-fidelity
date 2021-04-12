@@ -30,4 +30,11 @@ done
 # create initial layout files
 echo "Now creating initial layouts $layout_number_start through $layout_number_end"
 layout_directory_path="../data/initial-layouts/horns-rev/"
-julia generate_initial_layout.jl $boundary_type $boundary_file_path $nturbines $rotor_diameter $layout_number_start $layout_number_end $layout_directory_path
+julia generate_initial_layout.jl \
+$boundary_type \
+$boundary_file_path \
+$nturbines \
+$rotor_diameter \
+$layout_number_start \
+$layout_number_end \
+$layout_directory_path
