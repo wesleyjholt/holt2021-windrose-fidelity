@@ -52,6 +52,6 @@ mkpath(_aeps_directory_path)
 
 # write to text file
 open(_aeps_directory_path * _aeps_file_name, "w") do io
-    write(io, "# AEP values for layouts $_layout_number_start to $_layout_number_end")
+    write(io, "# AEP values for layouts $_layout_number_start to $_layout_number_end\n")
     writedlm(io, aeps)
 end

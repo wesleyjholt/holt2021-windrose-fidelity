@@ -16,12 +16,19 @@ struct ConfidenceIntervalScatterPlot <: AEPPlot
     # confidence interval with scatter plot
 end
 
+struct SurfacePlot <: AEPPlot
+    # surface plot (using Plots.jl package)
+end
+
 
 include("_boundary.jl")
 using PyPlot
+import Plots; Plots.gr()
+using Plots.PlotMeasures
 using DelimitedFiles
 using FillArrays
 using Statistics
+using GridInterpolations
 
 """
     plot_initial_final_layout(x_initial, x_final, turbine_design, boundary::CircleBoundary; show_fig=true, save_fig=false, path_to_fig_file="layout.png")
@@ -129,11 +136,92 @@ function plot_turbines(x, rotor_diameter; color="C0", fill=true, alpha=1.0, line
 end
 
 
+function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_type::SurfacePlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts", xlabel="", ylabel="")
+
+    # get the AEP values from the files
+    aeps = get_aep_values_from_file_names(data_file_names)
+    # specify the number of groups
+    n_x = length(x_values)
+    n_y = length(y_values)
+    # get x and y arrays
+    X = x_values .* ones(n_x)
+    Y = ones(n_y) .* y_values
+    # get mean AEP value for each X-Y combination
+    mean_aeps = zeros(n_ndirs_vec, n_nspeeds_vec)
+    for i = 1:n_ndirs_vec
+        for j = 1:n_nspeeds_vec
+            mean_aeps[i,j] = mean(aeps[i,j])
+        end
+    end
+    # normalize the mean AEP values
+    norm_mean_aeps = mean_aeps ./ maximum(mean_aeps) * 100.0
+    println(norm_mean_aeps)
+    # reverse n_directions vector to be in ascending order
+    x_values_reversed = reverse(x_values)
+    norm_mean_aeps_reversed = reverse(norm_mean_aeps, dims=1)
+    # interpolate mean AEP values onto a finer grid for plotting
+    x_plot = range(minimum(x_values), stop=maximum(x_values), length=100)
+    y_plot = range(minimum(y_values), stop=maximum(y_values), length=100)
+    grid = RectangleGrid(x_values_reversed, y_values)
+    z_plot = zeros(length(x_plot), length(y_plot))
+    for i = 1:length(x_plot)
+        for j = 1:length(y_plot)
+            z_plot[i,j] = interpolate(grid, norm_mean_aeps_reversed, [x_plot[i], y_plot[j]])
+        end
+    end
+
+    # # create heatmap
+    # Plots.plot(x_plot, y_plot, z_plot, 
+    #     st=:heatmap, 
+    #     c=:blues, 
+    #     background_color=:white, 
+    #     foreground_color=:black, 
+    #     top_margin = 10px,
+    #     xlabel=xlabel,
+    #     ylabel=ylabel,
+    #     colorbar_title = "Normalized AEP (%)",
+    #     framestyle=:box,
+    #     clims=(minimum(norm_mean_aeps), maximum(norm_mean_aeps)),
+    #     dpi=500
+    #     )
+    
+    # create contour plot
+    Plots.plot(x_plot, y_plot, z_plot, 
+        st=:contour, 
+        fill=true,
+        c=:blues, 
+        background_color=:white, 
+        foreground_color=:black, 
+        foreground_color_border=:black,
+        top_margin=10px,
+        right_margin=20px,
+        left_margin=10px,
+        bottom_margin=20px,
+        linewidth=0,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        colorbar_title = "Normalized AEP (%)",
+        framestyle=:box,
+        clims=(minimum(norm_mean_aeps), maximum(norm_mean_aeps)),
+        dpi=500
+        )
+    
+    # save figure
+    if save_fig
+        mkpath(path_to_fig_directory)
+        Plots.savefig(path_to_fig_directory * fig_file_name)
+    end
+    # show figure
+    if show_fig
+        plt.show()
+    end
+end
+
 
 """
     plot_aeps(data_file_names, labels, plot_type::BoxPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names, x_values, plot_type::BoxPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::BoxPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts", xlabel="")
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
@@ -142,7 +230,7 @@ function plot_aeps(data_file_names, x_values, plot_type::BoxPlot; fig_handle="",
     # create box plots
     create_box_plots(x_values, aeps, ax)
     # add plot labels
-    add_aep_plot_labels(title, aeps)
+    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
@@ -159,7 +247,7 @@ end
 """
     plot_aeps(data_file_names, labels, plot_type::BoxScatterPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names, x_values, plot_type::BoxScatterPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::BoxScatterPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots_with_scatter.png", title="AEP Values for Optimized Layouts", xlabel="")
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
@@ -170,7 +258,7 @@ function plot_aeps(data_file_names, x_values, plot_type::BoxScatterPlot; fig_han
     # create scatter plots
     create_aep_scatter_plots(1:length(aeps), aeps, size=2)
     # add plot labels
-    add_aep_plot_labels(title, aeps)
+    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
@@ -187,7 +275,7 @@ end
 """
     plot_aeps(data_file_names, labels, plot_type::ConfidenceIntervalPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names, x_values, plot_type::ConfidenceIntervalPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot.png", title="AEP Values for Optimized Layouts", xlabel="")
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
@@ -196,7 +284,7 @@ function plot_aeps(data_file_names, x_values, plot_type::ConfidenceIntervalPlot;
     # create mean line with confidence interval
     create_confidence_interval_plot(x_values, aeps)
     # add plot labels
-    add_aep_plot_labels(title, aeps)
+    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
@@ -212,7 +300,7 @@ end
 """
     plot_aeps(data_file_names, labels, plot_type::ConfidenceIntervalScatterPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names, x_values, plot_type::ConfidenceIntervalScatterPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalScatterPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot_with_scatter.png", title="AEP Values for Optimized Layouts", xlabel="")
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
@@ -223,7 +311,7 @@ function plot_aeps(data_file_names, x_values, plot_type::ConfidenceIntervalScatt
     # create mean line with confidence interval
     create_confidence_interval_plot(x_values, aeps)
     # add plot labels
-    add_aep_plot_labels(title, aeps)
+    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
@@ -236,7 +324,7 @@ function plot_aeps(data_file_names, x_values, plot_type::ConfidenceIntervalScatt
 end
 
 
-function get_aep_values_from_file_names(data_file_names)
+function get_aep_values_from_file_names(data_file_names::Array{String,1})
     # get the AEP values from the files
     ngroups = length(data_file_names)
     aeps = fill(zeros(1), ngroups)
@@ -246,12 +334,58 @@ function get_aep_values_from_file_names(data_file_names)
     return aeps
 end
 
+
+function get_aep_values_from_file_names(data_file_names::Array{String,2})
+    # specify the number of groups
+    n_ndirs_vec = length(data_file_names[:,1])
+    n_nspeeds_vec = length(data_file_names[1,:])
+    # get AEP values from files
+    aeps = fill(zeros(1), n_ndirs_vec, n_nspeeds_vec)
+    for i = 1:n_ndirs_vec
+        for j = 1:n_nspeeds_vec
+            aeps[i,j] = readdlm(data_file_names[i,j], skipstart=1)[:,1]
+        end
+    end
+    return aeps
+end
+
+
+function create_aep_surface(x_values, y_values, aeps)
+
+    # specify the number of groups
+    n_x = length(x_values)
+    n_y = length(y_values)
+    # get x and y arrays
+    X = x_values .* ones(n_x)
+    Y = ones(n_y) .* y_values
+    # get mean AEP value for each X-Y combination
+    mean_aeps = zeros(n_ndirs_vec, n_nspeeds_vec)
+    for i = 1:n_ndirs_vec
+        for j = 1:n_nspeeds_vec
+            mean_aeps[i,j] = mean(aeps[i,j])
+        end
+    end
+    # create surface plot
+    Plots.plot(x_values, y_values, mean_aeps, st=:surface, c=:blues, camera=(90,90), zaxis=false)
+    # ax = plt.gca()
+    # ax.view_init(90, 90)
+    # ax.w_zaxis.line.set_lw(0.)
+    # ax.set_zticks([])
+    # plt.colorbar(colormap)
+    # plt.gcf().colorbar(surf, shrink=0.5, aspect=5)
+end
+
+
 function create_box_plots(x_values, aeps, ax)
     flierprops = Dict{String, Any}()
     flierprops["markersize"] = 3
     flierprops["markeredgewidth"] = 0.5
     plt.boxplot(aeps, whis=(5, 95), flierprops=flierprops, zorder=1)
-    ax.set_xticklabels(round.(x_values, digits=1))
+    if isa(x_values, Array{Float64,1})
+        ax.set_xticklabels(round.(x_values, digits=1))
+    else
+        ax.set_xticklabels(x_values)
+    end
     ax.xaxis.grid(true, alpha=0.2, linestyle="--")
 end
 
@@ -273,10 +407,16 @@ function create_confidence_interval_plot(x_values, aeps, confidence_interval_wid
     plt.fill_between(x_values, aeps_lower_CI, aeps_upper_CI, color="black", alpha=0.1, linewidth=0.0)
 end
 
-function add_aep_plot_labels(title, aeps; xlabel=L"\Delta\theta")
-    plt.title("$title\n($(length(aeps[1])) random layouts for each wind rose)")
-    plt.xlabel(L"\Delta\theta")
-    plt.ylabel("AEP (MWh)")
+function add_aep_plot_labels(; type=type::Union{BoxPlot, BoxScatterPlot, ConfidenceIntervalPlot, ConfidenceIntervalScatterPlot}, title="", xlabel="", ylabel="AEP (MWh)")
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+end
+
+function add_aep_plot_labels(; type=type::SurfacePlot, title="", xlabel="", ylabel="")
+    Plots.plot(title=title)
+    # Plots.xlabel(xlabel)
+    # Plots.ylabel(ylabel)
 end
 
 
