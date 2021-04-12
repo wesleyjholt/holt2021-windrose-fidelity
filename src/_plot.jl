@@ -23,7 +23,7 @@ end
 
 include("_boundary.jl")
 using PyPlot
-import Plots; Plots.gr()
+import Plots
 using Plots.PlotMeasures
 using DelimitedFiles
 using FillArrays
@@ -138,6 +138,7 @@ end
 
 function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_type::SurfacePlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts", xlabel="", ylabel="")
 
+    Plots.gr()
     # get the AEP values from the files
     aeps = get_aep_values_from_file_names(data_file_names)
     # specify the number of groups
