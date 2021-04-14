@@ -3,10 +3,11 @@
 #SBATCH --mem-per-cpu=4096M  # memory per CPU core
 #SBATCH --time=05:00:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
+#SBATCH -o ./Report/output.%a.out
 # #SBATCH --mail-user=wesleyjholt@gmail.com   # email address
 # #SBATCH --mail-type=BEGIN
 # #SBATCH --mail-type=END
-#SBATCH --array=3-4    # job array number corresponds to the layout numbers
+#SBATCH --array=3-5    # job array number corresponds to the layout numbers
 # #SBATCH --qos=test
 
 

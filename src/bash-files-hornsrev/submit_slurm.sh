@@ -9,8 +9,8 @@
 # set variable values
 nturbines=80
 boundary_file_path="../data/input-files/horns-rev-boundary.txt"
-ndirs_vec=(12 360) #(12 36 72 120 360)
-nspeeds_vec=(1 25) #(1 2 5 10 25)
+ndirs_vec=(12) #(12 36 72 120 360)
+nspeeds_vec=(1) #(1 2 5 10 25)
 ntasksmax=250
 
 # run optimizations for each combination of variables

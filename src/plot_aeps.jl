@@ -17,7 +17,7 @@ _fig_type = ARGS[10]
 
 
 #################################################################################
-# CREATE PLOTS
+# GET AEP VALUES
 #################################################################################
 # define plot type
 _fig_type = eval(Meta.parse("$_fig_type()"))
@@ -37,20 +37,25 @@ end
 # make create necessary directories to hold plot files
 mkpath(_aeps_plot_directory_path)
 
-# # directions plot
-# for j = 1:n_nspeeds_vec
-#     plot_file_name_no_ext = "final-aeps-$(lpad(_nspeeds_vec[j],2,"0"))speeds"
-#     plot_aeps(aep_file_names[:,j], 360 ./ _ndirs_vec, _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.pdf", title="", xlabel=L"\Delta\theta")
-#     plot_aeps(aep_file_names[:,j], 360 ./ _ndirs_vec, _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.png", title=_fig_title * "\n($(_nspeeds_vec[j]) speeds)", xlabel=L"\Delta\theta")
-# end
 
-# # speeds plot
-# for i = 1:n_ndirs_vec
-#     plot_file_name_no_ext = "final-aeps-$(lpad(_ndirs_vec[i],3,"0"))dirs"
-#     plot_aeps(aep_file_names[i,:], Int.(_nspeeds_vec), _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.pdf", title="", xlabel="Number of Wind Speeds")
-#     plot_aeps(aep_file_names[i,:], Int.(_nspeeds_vec), _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.png", title=_fig_title * "\n(" * L"\Delta\theta=" * "$(_ndirs_vec[i]))", xlabel="Number of Wind Speeds")
-# end
+#################################################################################
+# CREATE PLOTS
+#################################################################################
+
+# directions plot
+for j = 1:n_nspeeds_vec
+    plot_file_name_no_ext = "final-aeps-$(lpad(_nspeeds_vec[j],2,"0"))speeds"
+    plot_aeps(aep_file_names[:,j], _ndirs_vec, _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.pdf", title="", xlabel=L"\Delta\theta")
+    plot_aeps(aep_file_names[:,j], _ndirs_vec, _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.png", title=_fig_title * "\n($(_nspeeds_vec[j]) speeds)", xlabel=L"\Delta\theta")
+end
+
+# speeds plot
+for i = 1:n_ndirs_vec
+    plot_file_name_no_ext = "final-aeps-$(lpad(_ndirs_vec[i],3,"0"))dirs"
+    plot_aeps(aep_file_names[i,:], Int.(_nspeeds_vec), _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.pdf", title="", xlabel="Number of Wind Speeds")
+    plot_aeps(aep_file_names[i,:], Int.(_nspeeds_vec), _fig_type, save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="$plot_file_name_no_ext.png", title=_fig_title * "\n(" * L"\Delta\theta=" * "$(_ndirs_vec[i]))", xlabel="Number of Wind Speeds")
+end
 
 # direction and speed plot
-plot_aeps(aep_file_names, 360 ./ _ndirs_vec, Int.(_nspeeds_vec), SurfacePlot(), save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="final-aeps.pdf", title="", xlabel=L"\Delta\theta", ylabel="Number of Wind Speeds")
-plot_aeps(aep_file_names, 360 ./ _ndirs_vec, Int.(_nspeeds_vec), SurfacePlot(), save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="final-aeps.png", title=_fig_title, xlabel=L"\Delta\theta", ylabel="Number of Wind Speeds")
+plot_aeps(aep_file_names, _ndirs_vec, Int.(_nspeeds_vec), SurfacePlot(), save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="final-aeps.pdf", title="", xlabel=L"\Delta\theta", ylabel="Number of Wind Speeds")
+plot_aeps(aep_file_names, _ndirs_vec, Int.(_nspeeds_vec), SurfacePlot(), save_fig=true, path_to_fig_directory=_aeps_plot_directory_path, fig_file_name="final-aeps.png", title=_fig_title, xlabel=L"\Delta\theta", ylabel="Number of Wind Speeds")

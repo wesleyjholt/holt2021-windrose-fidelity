@@ -191,8 +191,26 @@ end
 obj_with_TI(x) = obj_with_TI(x, layout_param, model_param, opt_algorithm)
 obj_no_TI(x) = obj_no_TI(x, layout_param, model_param, opt_algorithm)
 
+
 # set up constraint wrapper function
-function con(x, model_param, boundary)
+function con(x, model_param, boundary::CircleBoundary)
+
+    # get number of turbines
+    nturbines = Int(length(x)/2)
+    
+    # extract x and y locations of turbines from design variables vector
+    turbine_x = x[1:nturbines]
+    turbine_y = x[nturbines+1:end]
+
+    # get constraint values
+    spacing_con = 2.0*model_param.turbine_design.rotor_diameter[1] .- ff.turbine_spacing(turbine_x,turbine_y)
+    boundary_con = ff.circle_boundary(boundary.center, boundary.radius, turbine_x, turbine_y)
+    
+    return [spacing_con; boundary_con]
+end
+
+# set up constraint wrapper function
+function con(x, model_param, boundary::FreeFormBoundary)
 
     # get number of turbines
     nturbines = Int(length(x)/2)

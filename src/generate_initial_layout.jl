@@ -22,6 +22,7 @@ _layout_directory_path = ARGS[7]
 #################################################################################
 # GENERATE INITIAL LAYOUT
 #################################################################################
+mkpath(_layout_directory_path)
 boundary = eval(Meta.parse("$_boundary_type($_boundary_input_arg)"))
 for layout_number in _layout_number_start:_layout_number_end
     layout_file_path = _layout_directory_path * "initial-layout-$(lpad(layout_number,3,"0")).txt"

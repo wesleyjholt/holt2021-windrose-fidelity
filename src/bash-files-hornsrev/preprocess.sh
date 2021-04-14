@@ -7,7 +7,7 @@
 # which wind roses to create
 windrose=HornsRevWindRose
 ndirs_vec=(12 36 72 120 360)
-nspeeds_vec=(1 2 5 10 25)
+nspeeds_vec=(15 20) #(1 2 5 10 25)
 
 # quantity and type of initial layouts to create
 boundary_type=FreeFormBoundary

@@ -7,10 +7,10 @@
 # This file assumes that user is running it from the "src" directory.
 
 # set variable values
-nturbines_vec=(9)
+nturbines_vec=(16)
 boundary_radius_vec=(900)
-ndirs_vec=(30)
-nspeeds_vec=(1)
+ndirs_vec=(16)
+nspeeds_vec=(5)
 
 # run optimizations for each combination of variables
 for nturbines in ${nturbines_vec[@]}
