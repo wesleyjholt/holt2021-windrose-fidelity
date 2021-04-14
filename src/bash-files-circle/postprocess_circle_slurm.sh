@@ -1,16 +1,5 @@
 #!/bin/sh
 
-#SBATCH --ntasks=2
-#SBATCH --mem-per-cpu=2056  # memory per CPU core
-#SBATCH --time=00:05:00 # walltime
-#SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
-# #SBATCH -o ./Report/output.%a.out
-# #SBATCH --array=1-2    # job array number corresponds to the layout numbers
-#SBATCH --qos=test
-
-# LOAD JULIA
-module load julia
-
 # CALCULATE AEPS WITH SEVERAL DIFFERENT WIND ROSE FIDELITY LEVELS AND WAKE MODELS
 
 # set what analyses to run
@@ -65,7 +54,7 @@ do
                             aeps_directory_path="../results/final-aeps/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/${ndirs}dirs/${nspeeds}speeds/"
                             aeps_file_path=$aeps_directory_path$aeps_file_name
                             parallel_processing=true
-                            julia calc_aeps.jl \
+                            sbatch bash-files-circle/calc_aeps.sh \
                                 360 \
                                 25 \
                                 $windrose \
