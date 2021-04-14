@@ -22,7 +22,7 @@ turbine_type=NREL_5MW
 wake_model=GaussYawVariableSpread
 opt_algorithm=SnoptWECAlgorithm
 opt_algorithm_arg="1e-6, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [3e-3, 3e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6], [false, false, false, false, false, false, true], Int(1e5), false"
-boundary_shape=FreeFormBoundary
+boundary_shape=CircleBoundary
 
 # These are the file paths for the input and output info.
 initial_layout_path="../data/initial-layouts/circle/${nturbines}turb/${boundary_radius}r/initial-layout-${layout_number}.txt"
