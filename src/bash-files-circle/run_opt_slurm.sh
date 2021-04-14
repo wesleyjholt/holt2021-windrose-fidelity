@@ -17,8 +17,8 @@ ndirs=$(printf %3s $3 | tr ' ' 0)
 nspeeds=$(printf %2s $4 | tr ' ' 0)
 
 # These variables stay constant for each optimization.
-windrose=NantucketWindRose
-turbine_type=NREL_5MW
+windrose=HornsRevWindRose
+turbine_type=VestasV80_2MW
 wake_model=GaussYawVariableSpread
 opt_algorithm=SnoptWECAlgorithm
 opt_algorithm_arg="1e-6, [3.0, 2.6, 2.2, 1.8, 1.4, 1.0, 1.0], [3e-3, 3e-3, 1e-3, 1e-4, 1e-4, 1e-5, 1e-6], [false, false, false, false, false, false, true], Int(1e5), false"
