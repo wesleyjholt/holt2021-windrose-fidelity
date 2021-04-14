@@ -1,0 +1,62 @@
+title: "Optimized turbine layout"
+definitions:
+  wind_plant:
+    properties:
+      turbine:
+        items:
+          - $ref: ""
+        type: "array"
+    type: "object"
+    description: "specific plant design including turbine selection and placement"
+  plant_energy:
+    properties:
+      wake_model:
+        items:
+          - $ref: ""
+        description: "wake model used to calculate AEP"
+      annual_energy_production:
+        units: "MWh"
+        default: -83186.27819671662
+        binned: ""
+        description: "binned and total (default) annual energy production for a wind plant given a layout and binned wind rose"
+      wind_resource:
+        properties:
+          items:
+            - $ref: ""
+        description: "specific wind resource used to calculate AEP"
+    description: "energy production data"
+  position:
+    units: "m"
+    items:
+      -
+        - 997.8471955981868
+        - -666.5590553258085
+      -
+        - 234.96655928711644
+        - -1176.7713099905336
+      -
+        - -0.0005654797478368667
+        - 0.0002264817047184873
+      -
+        - -234.96618452834795
+        - 1176.7713848187298
+      -
+        - 1177.0669421958687
+        - 233.1005837347208
+      -
+        - -1177.0674555904773
+        - -233.1003004852357
+      -
+        - -997.84757141624
+        - 666.5584927211796
+      -
+        - 666.359052095193
+        - 997.9807681968651
+      -
+        - -666.360237838938
+        - -997.9799764660825
+    description: |-
+      an array of x and y-coordinates [x0, y0] 
+       [x1, y1] 
+       ... of wind turbine positions in cartesian coordinates
+description: ""
