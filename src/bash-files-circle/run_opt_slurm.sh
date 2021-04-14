@@ -12,6 +12,7 @@
 layout_number=$(printf %3s $SLURM_ARRAY_TASK_ID | tr ' ' 0)
 nturbines=$1
 boundary_radius=$2
+boundary_input_arg=$boundary_radius
 ndirs=$(printf %3s $3 | tr ' ' 0)
 nspeeds=$(printf %2s $4 | tr ' ' 0)
 
