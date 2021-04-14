@@ -1,9 +1,9 @@
 #!/bin/sh
 
-#SBATCH --mem-per-cpu=4096M  # memory per CPU core
+#SBATCH --mem-per-cpu=2056  # memory per CPU core
 #SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
-#SBATCH -o ./Report/output.%a.out
+# #SBATCH -o ./Report/output.%a.out
 #SBATCH --array=1-2    # job array number corresponds to the layout numbers
 #SBATCH --qos=test
 
