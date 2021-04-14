@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#SBATCH --ntasks=1
+#SBATCH --ntasks=2
 #SBATCH --mem-per-cpu=2056  # memory per CPU core
 #SBATCH --time=00:05:00 # walltime
 #SBATCH -J 'Wind Rose Study, Horns Rev 1 Wind Farm'
@@ -67,7 +67,7 @@ do
                             parallel_processing=true
                             julia calc_aeps.jl \
                                 360 \
-                                1 \
+                                25 \
                                 $windrose \
                                 $nturbines \
                                 $turbine_type \
