@@ -73,8 +73,8 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
         println("Now running with WEC = ", wec_string, " and no local TI")
 
         # set Snopt options
-        options["Summary file"] = "wec$(wec_string)-$(withTI_string)summary.out"
-        options["Print file"] = "wec$(wec_string)-$(withTI_string)print.out"
+        # options["Summary file"] = "wec$(wec_string)-$(withTI_string)summary.out"
+        # options["Print file"] = "wec$(wec_string)-$(withTI_string)print.out"
         options["Major optimality tolerance"] = opt_algorithm.tol[i]
 
         # call Snopt
