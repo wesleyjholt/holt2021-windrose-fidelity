@@ -13,6 +13,7 @@ _layouts_directory_path = ARGS[9]
 _aeps_directory_path = ARGS[10]
 _aeps_file_name = ARGS[11]
 _parallel_processing = parse(Bool, ARGS[12])
+_layout_type = ARGS[13]
 
 layout_number_vec = _layout_number_start:_layout_number_end
 
@@ -57,31 +58,61 @@ for i = 1:nlayouts
     layout_number = layout_number_vec[i]
 
     # get turbine layout
-    if isfile(_layouts_directory_path * "final-layout-$(lpad(layout_number,3,"0")).yaml") 
-        layouts_file_path = _layouts_directory_path * "final-layout-$(lpad(layout_number,3,"0")).yaml"
-        layout_param = layout_set(layouts_file_path, file_type="yaml")
+    if _layout_type == "initial_layout"
+        if isfile(_layouts_directory_path * "initial-layout-$(lpad(layout_number,3,"0")).txt") 
+            layouts_file_path = _layouts_directory_path * "initial-layout-$(lpad(layout_number,3,"0")).txt"
+            layout_param = layout_set(layouts_file_path, file_type="text")
 
-        if _parallel_processing
-            @everywhere layout_param = $layout_param
-            @everywhere model_param = $model_param
-            @everywhere calculate_aeps_parallel = ff.calculate_aep
-            # calculate AEP
-            aeps[i] = calculate_aeps_parallel(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
-                            model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
-                            model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
-                            rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            if _parallel_processing
+                @everywhere layout_param = $layout_param
+                @everywhere model_param = $model_param
+                @everywhere calculate_aeps_parallel = ff.calculate_aep
+                # calculate AEP
+                aeps[i] = calculate_aeps_parallel(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                                model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                                model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                                rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            else
+                # calculate AEP
+                aeps[i] = ff.calculate_aep(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                                model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                                model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                                rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            end
+            append!(good_indices, i)
         else
-            # calculate AEP
-            aeps[i] = ff.calculate_aep(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
-                            model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
-                            model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
-                            rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            aeps[i] = NaN
+            append!(nan_indices, i)
         end
-        append!(good_indices, i)
-    else
-        aeps[i] = NaN
-        append!(nan_indices, i)
+
+    elseif _layout_type == "final_layout"
+        if isfile(_layouts_directory_path * "final-layout-$(lpad(layout_number,3,"0")).yaml") 
+            layouts_file_path = _layouts_directory_path * "final-layout-$(lpad(layout_number,3,"0")).yaml"
+            layout_param = layout_set(layouts_file_path, file_type="yaml")
+
+            if _parallel_processing
+                @everywhere layout_param = $layout_param
+                @everywhere model_param = $model_param
+                @everywhere calculate_aeps_parallel = ff.calculate_aep
+                # calculate AEP
+                aeps[i] = calculate_aeps_parallel(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                                model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                                model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                                rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            else
+                # calculate AEP
+                aeps[i] = ff.calculate_aep(layout_param.turbine_x, layout_param.turbine_y, layout_param.base_heights, model_param.turbine_design.rotor_diameter,
+                                model_param.turbine_design.hub_height, model_param.turbine_op.yaw, model_param.turbine_ct_models, model_param.turbine_design.generator_efficiency, model_param.turbine_design.cut_in_speed,
+                                model_param.turbine_design.cut_out_speed, model_param.turbine_design.rated_speed, model_param.turbine_design.rated_power, model_param.wind_resource_model, model_param.turbine_power_models, model_param.farm_model_with_ti,
+                                rotor_sample_points_y=model_param.velocity_sampling.rotor_sample_points_y, rotor_sample_points_z=model_param.velocity_sampling.rotor_sample_points_z)
+            end
+            append!(good_indices, i)
+        else
+            aeps[i] = NaN
+            append!(nan_indices, i)
+        end
     end
+
 end
 
 #################################################################################
@@ -103,7 +134,7 @@ end
 mkpath(_aeps_directory_path)
 
 # write to text file
-open(_aeps_directory_path * _aeps_file_name, "w") do io
+open(_aeps_directory_path * "montecarlo-" * _aeps_file_name, "w") do io
     write(io, "# layout number, AEP\n")
     for i = 1:length(layout_number_vec)
         write(io, "$(lpad(Int(layout_number_vec[i]),3,"0"))\t$(aeps[i])\n")
@@ -115,7 +146,7 @@ end
 # SAVE CLEANED AEP VALUES TO A TEXT FILE (NO NANs)
 #################################################################################
 # write to text file
-open(_aeps_directory_path * "cleaned-" * _aeps_file_name, "w") do io
+open(_aeps_directory_path * "montecarlo-cleaned-" * _aeps_file_name, "w") do io
     write(io, "# layout number, AEP (with NaN values removed)\n")
     for i = 1:length(good_layouts)
         write(io, "$(lpad(Int(good_layouts[i]),3,"0"))\t$(aeps[good_indices][i])\n")

@@ -3,7 +3,9 @@
 # CALCULATE AEPS WITH SEVERAL DIFFERENT WIND ROSE FIDELITY LEVELS AND WAKE MODELS
 
 # set what analyses to run
-calculate_aeps=true
+calculate_initial_aeps=true
+calculate_aeps=false
+calculate_montecarlo_aeps=false
 plot_layouts=false
 plot_aeps=false
 plot_montecarlo=false
@@ -28,6 +30,44 @@ layout_number_end=2
 aeps_fig_type=ConfidenceIntervalScatterPlot
 
 
+# calculate all initial AEP values
+for nturbines in ${nturbines_vec[@]}                                    # number of turbines
+do
+    for boundary_radius in ${boundary_radius_vec[@]}                    # circular farm boundary radius
+    do
+        if $calculate_initial_aeps == true
+        then
+
+            if $calculate_montecarlo_aeps == true
+            then
+                aeps_file_name="montecarlo-initial-aeps-GaussYawVariableSpread.txt"
+            else
+                aeps_file_name="intial-aeps-GaussYawVariableSpread.txt"
+            fi
+            
+            # calculate AEP values for initial layouts
+            initial_layouts_directory_path="../data/initial-layouts/circle/${nturbines}turb/${boundary_radius}r/"
+            initial_aeps_directory_path="../data/initial-aeps/circle/${nturbines}turb/${boundary_radius}r/"
+            parallel_processing=true
+            julia calc_aeps.jl \
+                360 \
+                25 \
+                $windrose \
+                $nturbines \
+                $turbine_type \
+                GaussYawVariableSpread \
+                $layout_number_start \
+                $layout_number_end \
+                $initial_layouts_directory_path \
+                $initial_aeps_directory_path \
+                $aeps_file_name \
+                $parallel_processing \
+                initial_layout
+        fi
+    done
+done
+
+
 # calculate and plot all AEP values for the specified layouts
 for nturbines in ${nturbines_vec[@]}                                    # number of turbines
 do
@@ -37,7 +77,12 @@ do
         do
             for analysis_wake_model in ${wake_model_vec[@]}             # analysis wake model
             do
-                aeps_file_name="final-aeps-${analysis_wake_model}.txt"
+                if $calculate_montecarlo_aeps == true
+                then
+                    aeps_file_name="montecarlo-final-aeps-${analysis_wake_model}.txt"
+                else
+                    aeps_file_name="final-aeps-${analysis_wake_model}.txt"
+                fi
 
                 for ndirs in ${ndirs_vec[@]}                            # number of wind directions used for optimization
                 do
@@ -66,7 +111,9 @@ do
                                 $layouts_directory_path \
                                 $aeps_directory_path \
                                 $aeps_file_name \
-                                $parallel_processing
+                                $parallel_processing \
+                                final_layout
+                            sleep 1
                         fi
                     done
 
