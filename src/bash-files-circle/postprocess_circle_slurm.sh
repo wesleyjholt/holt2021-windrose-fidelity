@@ -42,7 +42,7 @@ do
             then
                 aeps_file_name="montecarlo-initial-aeps-GaussYawVariableSpread.txt"
             else
-                aeps_file_name="intial-aeps-GaussYawVariableSpread.txt"
+                aeps_file_name="initial-aeps-GaussYawVariableSpread.txt"
             fi
             
             # calculate AEP values for initial layouts
@@ -63,6 +63,7 @@ do
                 $aeps_file_name \
                 $parallel_processing \
                 initial_layout
+            sleep 1
         fi
     done
 done

@@ -134,7 +134,7 @@ end
 mkpath(_aeps_directory_path)
 
 # write to text file
-open(_aeps_directory_path * "montecarlo-" * _aeps_file_name, "w") do io
+open(_aeps_directory_path * _aeps_file_name, "w") do io
     write(io, "# layout number, AEP\n")
     for i = 1:length(layout_number_vec)
         write(io, "$(lpad(Int(layout_number_vec[i]),3,"0"))\t$(aeps[i])\n")
@@ -146,7 +146,7 @@ end
 # SAVE CLEANED AEP VALUES TO A TEXT FILE (NO NANs)
 #################################################################################
 # write to text file
-open(_aeps_directory_path * "montecarlo-cleaned-" * _aeps_file_name, "w") do io
+open(_aeps_directory_path * "cleaned-" * _aeps_file_name, "w") do io
     write(io, "# layout number, AEP (with NaN values removed)\n")
     for i = 1:length(good_layouts)
         write(io, "$(lpad(Int(good_layouts[i]),3,"0"))\t$(aeps[good_indices][i])\n")
