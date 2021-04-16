@@ -53,9 +53,9 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
     #################################################################################
 
     # navigate to opt info directory (to store .out files from Snopt)
-    # original_directory = pwd()
-    # mkpath(opt_info_directory)
-    # cd(opt_info_directory)
+    original_directory = pwd()
+    mkpath(opt_info_directory)
+    cd(opt_info_directory)
     
     # run WEC optimizations
     for i = 1:length(opt_algorithm.wec)
@@ -73,10 +73,10 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
         println("Now running with WEC = ", wec_string, " and no local TI")
 
         # set Snopt options
-        # options["Summary file"] = "wec$(wec_string)-$(withTI_string)summary.out"
-        # options["Print file"] = "wec$(wec_string)-$(withTI_string)print.out"
-        options["Summary file"] = "summary.out"
-        options["Print file"] = "print.out"
+        options["Summary file"] = "wec$(wec_string)-$(withTI_string)summary.out"
+        options["Print file"] = "wec$(wec_string)-$(withTI_string)print.out"
+        # options["Summary file"] = "summary.out"
+        # options["Print file"] = "print.out"
         options["Major optimality tolerance"] = opt_algorithm.tol[i]
 
         # call Snopt
@@ -90,7 +90,7 @@ function optimize_farm_layout(wind_farm_opt_with_TI, wind_farm_opt_no_TI, final_
     end
 
     # navigate back to original directory
-    # cd(original_directory)
+    cd(original_directory)
 
 
     #################################################################################
