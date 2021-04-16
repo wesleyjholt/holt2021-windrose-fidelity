@@ -49,7 +49,7 @@ do
             initial_layouts_directory_path="../data/initial-layouts/circle/${nturbines}turb/${boundary_radius}r/"
             initial_aeps_directory_path="../data/initial-aeps/circle/${nturbines}turb/${boundary_radius}r/"
             parallel_processing=true
-            julia calc_aeps.jl \
+            sbatch bash-files-circle/calc_aeps.sh \
                 360 \
                 25 \
                 $windrose \
