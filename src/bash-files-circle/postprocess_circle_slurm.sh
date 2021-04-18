@@ -5,26 +5,26 @@
 # set what analyses to run
 calculate_initial_aeps=true
 calculate_aeps=false
-calculate_montecarlo_aeps=false
+calculate_montecarlo_aeps=true
 plot_layouts=false
 plot_aeps=false
 plot_montecarlo=false
 
 # set model parameters
 nturbines_vec=(9)
-boundary_radius_vec=(600 900 1200)
-ndirs_vec=(360 180) #(360 180 120 90 72 60 51 45 36 33 30 28 26 24 22 20 18 16 14 12 10 8)
-ndirs_vec_julia=[360,180] #[360,180,120,90,72,60,51,45,36,33,30,28,26,24,22,20,18,16,14,12,10,8]
-nspeeds_vec=(1 10) #(1 5 10 20)
-nspeeds_vec_julia=[01,10] #[01,05,10,20]
+boundary_radius_vec=(900)
+ndirs_vec=(360) #(360 180 120 90 72 60 51 45 36 33 30 28 26 24 22 20 18 16 14 12 10 8)
+ndirs_vec_julia=[360] #[360,180,120,90,72,60,51,45,36,33,30,28,26,24,22,20,18,16,14,12,10,8]
+nspeeds_vec=(1) #(1 5 10 20)
+nspeeds_vec_julia=[01] #[01,05,10,20]
 windrose=HornsRevWindRose
 turbine_type=VestasV80_2MW
 wake_model_vec=(GaussYawVariableSpread)
 opt_algorithm=SnoptWECAlgorithm
 
 # set layout numbers
-layout_number_start=1
-layout_number_end=2
+layout_number_start=5001
+layout_number_end=10000
 
 # AEP plot parameters
 aeps_fig_type=ConfidenceIntervalScatterPlot
