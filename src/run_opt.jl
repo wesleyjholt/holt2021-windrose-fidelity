@@ -56,10 +56,10 @@ if _parallel_processing
         addprocs(SlurmManager(ntasks - 1))
         println("\nWe added the processors.")
     end
-    @everywhere import FlowFarm; const ff = FlowFarm
+    @everywhere import FLOWFarm; const ff = FLOWFarm
     @everywhere include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 else
-    import FlowFarm; const ff = FlowFarm
+    import FLOWFarm; const ff = FLOWFarm
     include.(["_aepmodel.jl", "_algorithm.jl", "_boundary.jl", "_farm.jl", "_layout.jl", "_opt.jl", "_plot.jl", "_turbine.jl", "_windrose.jl"])
 end
 println("Packages are imported.")
@@ -220,15 +220,14 @@ function con(x, model_param, boundary::FreeFormBoundary)
     turbine_y = x[nturbines+1:end]
 
     # get constraint values
-    spacing_con = 2.0*model_param.turbine_design.rotor_diameter[1] .- ff.turbine_spacing(turbine_x,turbine_y)
     boundary_con = ff.ray_trace_boundary(boundary.vertices, boundary.normals, turbine_x, turbine_y)
+    spacing_con = 2.0*model_param.turbine_design.rotor_diameter[1] .- ff.turbine_spacing(turbine_x,turbine_y)
     
-    return [spacing_con; boundary_con]
+    return [boundary_con; spacing_con]
 end
 
 con(x) = con(x, model_param, farm_boundary)
 
-# set up optimization problem wrapper function
 function wind_farm_opt_with_TI(x)
 
     # calculate the objective and jacobian (negative sign in order to maximize AEP)
@@ -262,6 +261,77 @@ function wind_farm_opt_no_TI(x)
     # return objective, constraint, and jacobian values
     return AEP, c, dAEP_dx, dc_dx, fail
 end
+
+function wind_farm_opt_with_TI!(x)
+
+    # calculate the objective and jacobian (negative sign in order to maximize AEP)
+    AEP = -obj_with_TI(x)[1]
+    dAEP_dx = -ForwardDiff.jacobian(obj_with_TI, x)
+    df[:] = dAEP_dx[:]
+
+    # calculate constraint and jacobian
+    c = con(x)
+    g[:] = c[:]
+    dc_dx = ForwardDiff.jacobian(con, x)
+    dg[:] = dc_dx[:]
+
+    # set fail flag to false
+    fail = false
+
+    # return objective, constraint, and jacobian values
+    return AEP #, c, dAEP_dx, dc_dx, fail
+end
+
+function wind_farm_opt_no_TI!(g, df, dg, x, deriv)
+
+    # calculate the objective and jacobian (negative sign in order to maximize AEP)
+    AEP = -obj_no_TI(x)[1]
+    dAEP_dx = -ForwardDiff.jacobian(obj_no_TI, x)
+    df[:] = dAEP_dx[:]
+
+    # calculate constraint and jacobian
+    c = con(x)
+    g[:] = c[:]
+    dc_dx = ForwardDiff.jacobian(con, x)
+    
+    dg[:] = dc_dx[:]
+
+    # set fail flag to false
+    fail = false
+
+    # return objective, constraint, and jacobian values
+    return AEP #, c, dAEP_dx, dc_dx, fail
+end
+
+# # set up optimization problem wrapper function
+# function wind_farm_opt_with_TI!(g, df, dg, x, deriv)
+
+#     # calculate spacing constraint value and jacobian
+#     spacing_con = spacing_wrapper(x)
+#     ds_dx = ForwardDiff.jacobian(spacing_wrapper, x)
+
+#     # calculate boundary constraint and jacobian
+#     boundary_con = boundary_wrapper(x)
+#     db_dx = ForwardDiff.jacobian(boundary_wrapper, x)
+
+#     # combine constaint values and jacobians into overall constaint value and jacobian arrays
+#     c = [spacing_con; boundary_con]
+#     dcdx = [ds_dx; db_dx]
+#     dg[:] = c[:]
+#     g[:] = c[:]
+
+#     # calculate the objective function and jacobian (negative sign in order to maximize AEP)
+#     AEP = -aep_wrapper(x)[1]
+#     dAEP_dx = -ForwardDiff.jacobian(aep_wrapper,x)
+#     df = dAEP_dx
+#     # set fail flag to false
+#     fail = false
+
+#     # return objective, constraint, and jacobian values
+#     # return AEP, c, dAEP_dx, dcdx, fail
+#     return AEP, fail
+# end
+
 
 #################################################################################
 # RUN OPTIMIZATION

@@ -20,11 +20,15 @@ struct SurfacePlot <: AEPPlot
     # surface plot (using Plots.jl package)
 end
 
+struct LinePlot <: AEPPlot
+    # line plots for each layout
+end
 
-include("_boundary.jl")
+
+include.(["_boundary.jl","_utilities.jl"])
 using PyPlot
-# import Plots
-# using Plots.PlotMeasures
+import Plots
+using Plots.PlotMeasures
 using DelimitedFiles
 using FillArrays
 using Statistics
@@ -136,11 +140,13 @@ function plot_turbines(x, rotor_diameter; color="C0", fill=true, alpha=1.0, line
 end
 
 
-function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_type::SurfacePlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts", xlabel="", ylabel="")
+function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_type::SurfacePlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts", xlabel="", ylabel="", upper_10percent=false)
 
     Plots.gr()
     # get the AEP values from the files
     aeps = get_aep_values_from_file_names(data_file_names)
+    # filter out NaN values from AEP
+    # aeps = filter_aeps(aeps_raw, layouts_must_match=true)
     # specify the number of groups
     n_x = length(x_values)
     n_y = length(y_values)
@@ -151,23 +157,29 @@ function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_ty
     mean_aeps = zeros(n_ndirs_vec, n_nspeeds_vec)
     for i = 1:n_ndirs_vec
         for j = 1:n_nspeeds_vec
-            mean_aeps[i,j] = mean(aeps[i,j])
+            if !upper_10percent
+                mean_aeps[i,j] = mean(aeps[i,j])
+            else
+                mean_aeps[i,j] = calc_mean_upper10percent(aeps[i,j])
+            end
         end
     end
     # normalize the mean AEP values
-    norm_mean_aeps = mean_aeps ./ maximum(mean_aeps) * 100.0
-    println(norm_mean_aeps)
-    # reverse n_directions vector to be in ascending order
+    norm_mean_aeps = mean_aeps ./ maximum(maximum.(aeps)) * 100.0
+    println("Max AEP: $(maximum(maximum.(aeps)))")
+    # reverse n_directions and n_speeds vectors to be in ascending order
     x_values_reversed = reverse(x_values)
-    norm_mean_aeps_reversed = reverse(norm_mean_aeps, dims=1)
+    y_values_reversed = reverse(y_values)
+    norm_mean_aeps_reversed = reverse(reverse(norm_mean_aeps, dims=1), dims=2)
+
     # interpolate mean AEP values onto a finer grid for plotting
-    x_plot = range(minimum(x_values), stop=maximum(x_values), length=100)
-    y_plot = range(minimum(y_values), stop=maximum(y_values), length=100)
-    grid = RectangleGrid(x_values_reversed, y_values)
+    x_plot = range(minimum(x_values_reversed), stop=maximum(x_values_reversed), length=100)
+    y_plot = range(minimum(y_values_reversed), stop=maximum(y_values_reversed), length=100)
+    grid = RectangleGrid(x_values_reversed, y_values_reversed)
     z_plot = zeros(length(x_plot), length(y_plot))
     for i = 1:length(x_plot)
         for j = 1:length(y_plot)
-            z_plot[i,j] = interpolate(grid, norm_mean_aeps_reversed, [x_plot[i], y_plot[j]])
+            z_plot[j,i] = interpolate(grid, norm_mean_aeps_reversed, [y_plot[i], x_plot[j]])
         end
     end
 
@@ -186,31 +198,47 @@ function plot_aeps(data_file_names::Array{String,2}, x_values, y_values, plot_ty
     #     dpi=500
     #     )
     
+    if !upper_10percent
+        _clims = (98.6, 100.0)
+        _colorbar_title = "Mean Normalized AEP (%)"
+    else
+        _clims = (99.0, 100.0) 
+        _colorbar_title = "Mean of Upper 10% of Norm AEP (%)"
+    end
     # create contour plot
-    Plots.plot(x_plot, y_plot, z_plot, 
+    Plots.plot(x_plot, y_plot, (x,y) -> interpolate(grid, norm_mean_aeps_reversed, [x,y]), 
         st=:contour, 
         fill=true,
-        c=:blues, 
-        background_color=:white, 
+        c=:Blues_9, 
+        background_color=:transparent, 
         foreground_color=:black, 
         foreground_color_border=:black,
-        top_margin=10px,
-        right_margin=20px,
+        top_margin=25px,
+        right_margin=10px,
         left_margin=10px,
-        bottom_margin=20px,
+        bottom_margin=10px,
         linewidth=0,
         xlabel=xlabel,
         ylabel=ylabel,
-        colorbar_title = "Normalized AEP (%)",
+        xguidefontsize=15,
+        yguidefontsize=15,
+        colorbar_title = _colorbar_title,
+        # colorbar_titlefonthalign = :right,
+        colorbar_title_location = :top,
         framestyle=:box,
-        clims=(minimum(norm_mean_aeps), maximum(norm_mean_aeps)),
+        clims=_clims,
+        # cticks=98.6:.2:100.0,
         dpi=500
         )
     
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
-        Plots.savefig(path_to_fig_directory * fig_file_name)
+        if !upper_10percent
+            Plots.savefig(path_to_fig_directory * fig_file_name)
+        else
+            Plots.savefig(path_to_fig_directory * "upper-10percent-" * fig_file_name)
+        end
     end
     # show figure
     if show_fig
@@ -276,14 +304,14 @@ end
 """
     plot_aeps(data_file_names, labels, plot_type::ConfidenceIntervalPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot.png", title="AEP Values for Optimized Layouts", xlabel="")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot.png", _title="AEP Values for Optimized Layouts", _xlabel="", upper_10percent=false)
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
     # get the AEP values from the files
     aeps = get_aep_values_from_file_names(data_file_names)
     # create mean line with confidence interval
-    create_confidence_interval_plot(x_values, aeps)
+    create_confidence_interval_plot(x_values, aeps, upper_10percent=upper_10percent)
     # add plot labels
     add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
     # save figure
@@ -301,18 +329,28 @@ end
 """
     plot_aeps(data_file_names, labels, plot_type::ConfidenceIntervalScatterPlot; show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_boxplots.png", title="AEP Values for Optimized Layouts")
 """
-function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalScatterPlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot_with_scatter.png", title="AEP Values for Optimized Layouts", xlabel="")
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::ConfidenceIntervalScatterPlot; max_aep = 1.0, fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_confidence_interval_plot_with_scatter.png", _title="AEP Values for Optimized Layouts", _xlabel="")
 
     # get figure and axes handles
     fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
     # get the AEP values from the files
-    aeps = get_aep_values_from_file_names(data_file_names)
+    aeps_raw = get_aep_values_from_file_names(data_file_names)
+    # filter out NaN values
+    aeps = filter_aeps(aeps_raw)/max_aep
     # create scatter plots
     create_aep_scatter_plots(x_values, aeps)
     # create mean line with confidence interval
     create_confidence_interval_plot(x_values, aeps)
     # add plot labels
-    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
+    title(_title)
+    xlabel(_xlabel)
+    if max_aep == 1.0
+        ylabel("AEP (MWh)")
+    else
+        ylabel("Normalized AEP")
+        ylim([0.979, 1.0])
+        yticks([0.98, 0.985, 0.99, 0.995, 1.0])
+    end
     # save figure
     if save_fig
         mkpath(path_to_fig_directory)
@@ -325,29 +363,25 @@ function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::Confid
 end
 
 
-function get_aep_values_from_file_names(data_file_names::Array{String,1})
+function plot_aeps(data_file_names::Array{String,1}, x_values, plot_type::LinePlot; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="aep_line_plot.png", title="AEP Values for Optimized Layouts", xlabel="")
+
+    # get figure and axes handles
+    fig, ax = get_fig_ax_handles(fig_handle, ax_handle)
     # get the AEP values from the files
-    ngroups = length(data_file_names)
-    aeps = fill(zeros(1), ngroups)
-    for i = 1:ngroups
-        aeps[i] = readdlm(data_file_names[i], skipstart=1)[:,1]
+    aeps = get_aep_values_from_file_names(data_file_names)
+    # create line plots
+    create_line_plot(x_values, aeps)
+    # add plot labels
+    add_aep_plot_labels(type=plot_type, title=title, xlabel=xlabel)
+    # save figure
+    if save_fig
+        mkpath(path_to_fig_directory)
+        savefig(path_to_fig_directory * fig_file_name , dpi=600)
     end
-    return aeps
-end
-
-
-function get_aep_values_from_file_names(data_file_names::Array{String,2})
-    # specify the number of groups
-    n_ndirs_vec = length(data_file_names[:,1])
-    n_nspeeds_vec = length(data_file_names[1,:])
-    # get AEP values from files
-    aeps = fill(zeros(1), n_ndirs_vec, n_nspeeds_vec)
-    for i = 1:n_ndirs_vec
-        for j = 1:n_nspeeds_vec
-            aeps[i,j] = readdlm(data_file_names[i,j], skipstart=1)[:,1]
-        end
+    # show figure
+    if show_fig
+        plt.show()
     end
-    return aeps
 end
 
 
@@ -399,19 +433,32 @@ function create_aep_scatter_plots(x_values, aeps; alpha=0.3, size=2, jitter_stan
     end
 end
 
-function create_confidence_interval_plot(x_values, aeps, confidence_interval_width=1.0)
-    aeps_means = mean.(aeps)
-    aeps_sd = std.(aeps)
-    aeps_lower_CI = aeps_means - aeps_sd*confidence_interval_width
-    aeps_upper_CI = aeps_means + aeps_sd*confidence_interval_width
+function create_confidence_interval_plot(x_values, aeps; confidence_interval_width=1.0, upper_10percent=false)
+    if !upper_10percent
+        aeps_means = mean.(aeps)
+        aeps_std = std.(aeps)
+    else
+        aeps_means = calc_mean_upper10percent.(aeps)
+        aeps_std = calc_std_upper10percent.(aeps)
+    end
+    aeps_lower_CI = aeps_means - aeps_std*confidence_interval_width
+    aeps_upper_CI = aeps_means + aeps_std*confidence_interval_width
     plt.plot(x_values, aeps_means, color="black", alpha=0.5, linewidth=1)
+    aeps_lower_CI = reshape(aeps_lower_CI, length(aeps_lower_CI))
+    aeps_upper_CI = reshape(aeps_upper_CI, length(aeps_upper_CI))
     plt.fill_between(x_values, aeps_lower_CI, aeps_upper_CI, color="black", alpha=0.1, linewidth=0.0)
 end
 
-function add_aep_plot_labels(; type=type::Union{BoxPlot, BoxScatterPlot, ConfidenceIntervalPlot, ConfidenceIntervalScatterPlot}, title="", xlabel="", ylabel="AEP (MWh)")
-    plt.title(title)
-    plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+function create_line_plot(x_values, aeps)
+    for i = 1:length(aeps[1])
+        plt.plot(x_values, aeps[i], color="C0", alpha=0.5)
+    end
+end
+
+function add_aep_plot_labels(; type=type::Union{BoxPlot, BoxScatterPlot, ConfidenceIntervalPlot, ConfidenceIntervalScatterPlot}, title="", x_label="", y_label="AEP (MWh)")
+    title(title)
+    xlabel(x_label)
+    ylabel(y_label)
 end
 
 function add_aep_plot_labels(; type=type::SurfacePlot, title="", xlabel="", ylabel="")
@@ -436,5 +483,327 @@ function get_fig_ax_handles(fig_handle, ax_handle)
     end
 
     return fig, ax
+end
+
+
+
+function plot_montecarlo(data_file_names::Array{String,2}, max_aep, sample_sizes, ndirs_vec, nspeeds_vec; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="montecarlo_plot.png", title="Monte Carlo Simulation", xlabel="")
+
+    # get the AEP values from the files
+    aeps = get_aep_values_from_file_names(data_file_names)
+
+    # throw out AEPs for layouts that have at least one NaN
+    # aeps_filtered = filter_aeps(aeps_raw)
+
+    # normalize AEP values (assuming aeps_filtered[end,end] contains results for 360 directions and 25 wind speeds)
+    # aeps_normalized = normalize_aeps(aeps_filtered)
+    # println(aeps_normalized)
+
+    # get number of directions and speeds
+    n_ndirs = length(ndirs_vec)
+    n_nspeeds = length(nspeeds_vec)
+
+    # initialize convergence plots
+    figure()
+    subplot(211)
+    plt.title("Monte Carlo Convergence Plots")
+    plt.ylabel("Mean AEP\n(MWh)")
+
+    subplot(212)
+    plt.xlabel("Sample Size")
+    plt.ylabel("Standard Deviation AEP\n(MWh)")
+
+    # iterate through each speed and direction
+    legend_labels = fill("", Int(n_ndirs*n_nspeeds))
+    for i = 1:n_ndirs
+        for j = 1:n_nspeeds
+            # group into samples and calculate means and standard deviations
+            n_sample_sizes = length(sample_sizes[i,j])
+            mean_aeps = zeros(n_sample_sizes)
+            std_aeps = zeros(n_sample_sizes)
+            index_1 = 1
+            index_2 = 0
+            for k = 1:n_sample_sizes
+                index_2 += Int(sample_sizes[i,j][k])
+                mean_aeps[k] = mean(aeps[i,j][index_1:index_2])
+                std_aeps[k] = std(aeps[i,j][index_1:index_2])
+                index_1 = deepcopy(index_2)
+            end
+            mean_aeps_normalized = mean_aeps/max_aep
+            subplot(211)
+            scatter(sample_sizes[i,j], mean_aeps_normalized, color="C0")
+            subplot(212)
+            scatter(sample_sizes[i,j], std_aeps, color="C0")
+            legend_labels[(i-1)*n_nspeeds + j] = "$(ndirs_vec[i]) dirs, $(nspeeds_vec[j]) speeds"
+        end
+    end
+
+    # add legend
+    plt.legend(legend_labels)
+
+    # save figure
+    if save_fig
+        savefig(path_to_fig_directory * fig_file_name, dpi=600)
+    end
+
+    # show figure
+    if show_fig
+        plt.show()
+    end
+end
+
+
+
+function plot_montecarlo_old(data_file_name::String, max_aep, sample_sizes, ndirs_vec, nspeeds_vec; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="montecarlo_plot.png", title="", xlabel="")
+
+    # get the AEP values from the files
+    aeps = get_aep_values_from_file_names(data_file_name)
+
+    # initialize convergence plots
+    fig = figure()
+    ax1 = fig.add_axes([0.18, 0.55, 0.8, 0.35])
+    plt.title(title, fontsize=16)
+    plt.ylabel("Mean Normalized AEP\n(MWh)", fontsize=14)
+
+    ax2 = fig.add_axes([0.18, 0.1, 0.8, 0.35])
+    plt.xlabel("Sample Size", fontsize=14)
+    plt.ylabel("95th Percentile AEP\n(MWh)", fontsize=14)
+
+    # group into samples and calculate means and standard deviations
+    n_sample_sizes = length(sample_sizes)
+    mean_aeps = zeros(n_sample_sizes)
+    mean_upper10percent_aeps = zeros(n_sample_sizes)
+    index_1 = 1
+    index_2 = 0
+    for k = 1:n_sample_sizes
+        index_2 += Int(sample_sizes[k])
+        mean_aeps[k] = mean(aeps[index_1:index_2])
+        mean_upper10percent_aeps[k] = calc_mean_upper10percent(aeps[index_1:index_2])
+        index_1 = deepcopy(index_2)
+    end
+    mean_aeps_normalized = mean_aeps/max_aep
+    mean_upper10percent_aeps_normalized = mean_upper10percent_aeps/max_aep
+    
+    ax1.scatter(sample_sizes, mean_aeps_normalized, color="C0")
+    # yticks([floor(minimum(mean_aeps_normalized), digits=4):0.0001:ceil(maximum(mean_aeps_normalized), digits=4)])
+    
+    ax2.scatter(sample_sizes, mean_upper10percent_aeps_normalized, color="C0")
+    yticks([floor(minimum(mean_upper10percent_aeps), digits=4):0.0001:ceil(maximum(mean_upper10percent_aeps), digits=4)])
+    # ylim([0.9979, 0.9984])
+
+    # save figure
+    if save_fig
+        savefig(path_to_fig_directory * fig_file_name, dpi=600)
+    end
+
+    # show figure
+    if show_fig
+        plt.show()
+    end
+end
+
+
+function plot_montecarlo(data_file_name::String, max_aep, sample_sizes, ndirs_vec, nspeeds_vec; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="montecarlo_plot.png", title="", xlabel="")
+
+    # get the AEP values from the files
+    aeps = get_aep_values_from_file_names(data_file_name)
+
+    # initialize scatter plot
+    fig = figure()
+    ax = fig.add_axes([0.15, 0.1, 0.8, 0.8])
+    plt.title(title, fontsize=16)
+    plt.xlabel("Sample Size", fontsize=14)
+    plt.ylabel("Mean Normalized AEP", fontsize=14)
+
+    # group into samples and calculate means and standard deviations
+    n_sample_sizes = length(sample_sizes)
+    mean_aeps = zeros(n_sample_sizes)
+    mean_upper10percent_aeps = zeros(n_sample_sizes)
+    index_1 = 1
+    index_2 = 0
+    for k = 1:n_sample_sizes
+        index_2 += Int(sample_sizes[k])
+        mean_aeps[k] = mean(aeps[index_1:index_2])
+        mean_upper10percent_aeps[k] = calc_mean_upper10percent(aeps[index_1:index_2])
+        index_1 = deepcopy(index_2)
+    end
+    mean_aeps_normalized = mean_aeps/max_aep
+    mean_upper10percent_aeps_normalized = mean_upper10percent_aeps/max_aep
+    
+    ax.scatter(sample_sizes, mean_aeps_normalized, color="C0", alpha=0.5, edgecolors="none")
+    # yticks([floor(minimum(mean_aeps_normalized), digits=4):0.0001:ceil(maximum(mean_aeps_normalized), digits=4)])
+    
+    ax.scatter(sample_sizes, mean_upper10percent_aeps_normalized, color="C1", alpha=0.5, edgecolors="none")
+    # yticks([floor(minimum(mean_upper10percent_aeps), digits=4):0.0001:ceil(maximum(mean_upper10percent_aeps), digits=4)])
+    ylim([0.997, 1.0])
+
+    legend(["Mean of entire sample", "Mean of upper 10% of sample"])
+
+    # save figure
+    if save_fig
+        savefig(path_to_fig_directory * fig_file_name, dpi=600)
+    end
+
+    # show figure
+    if show_fig
+        plt.show()
+    end
+end
+
+
+function plot_initial_final_aep_scatter(initial_data_file_name::String, final_data_file_name::String, max_aep; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="initial_final_aep_plot.png", title="", xlabel="")
+
+    # get the AEP values from the files
+    initial_aeps = get_aep_values_from_file_names(initial_data_file_name)
+    final_aeps = get_aep_values_from_file_names(final_data_file_name)
+
+    # initialize scatter plot
+    fig = figure()
+    ax = fig.add_axes([0.15, 0.1, 0.8, 0.8])
+    plt.title(title, fontsize=16)
+    plt.xlabel("Initial Layout Normalized AEP", fontsize=14)
+    plt.ylabel("Final Layout Normalized AEP", fontsize=14)
+    plt.xlim([0.93,1.0])
+    plt.ylim([0.994,1.0])
+    println(length(initial_aeps))
+    println(length(final_aeps))
+    # plot the data
+    ax.scatter(initial_aeps ./ max_aep, final_aeps ./ max_aep, color="C0", s = 8, alpha=.3, edgecolors="none")
+
+    # save figure
+    if save_fig
+        savefig(path_to_fig_directory * fig_file_name, dpi=600)
+    end
+
+    # show figure
+    if show_fig
+        plt.show()
+    end
+
+end
+
+
+function plot_initial_final_aep_scatter_categorical(initial_data_file_name::String, final_data_file_name::String; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="initial_final_aep_plot.png", title="", xlabel="")
+
+    # get the AEP values from the files
+    initial_aeps = get_aep_values_from_file_names(initial_data_file_name)
+    final_aeps = get_aep_values_from_file_names(final_data_file_name)
+
+    # initialize scatter plot
+    fig = figure()
+    ax = fig.add_axes([0.15, 0.1, 0.8, 0.8])
+    plt.title(title, fontsize=16)
+    plt.xlabel("Initial Layout Percentile", fontsize=14)
+    plt.ylabel("Final Layout Percentile", fontsize=14)
+
+    # get percentile values
+    x_percentile = (sortperm(initial_aeps) .- 1)/length(initial_aeps) * 100
+    y_percentile = (sortperm(final_aeps) .- 1)/length(initial_aeps) * 100
+
+    # plot the data
+    ax.scatter(x_percentile, y_percentile, color="C0", s = 8, alpha=.3, edgecolors="none")
+
+    # save figure
+    if save_fig
+        savefig(path_to_fig_directory * fig_file_name, dpi=600)
+    end
+
+    # show figure
+    if show_fig
+        plt.show()
+    end
+
+end
+
+
+# function plot_montecarlo(data_file_names::Array{String,2}, sample_sizes, ndirs_vec, nspeeds_vec; fig_handle="", ax_handle="", show_fig=false, save_fig=true, path_to_fig_directory="", fig_file_name="montecarlo_plot.png", title="Monte Carlo Simulation", xlabel="")
+
+#     # get the AEP values from the files
+#     aeps = get_aep_values_from_file_names(data_file_names)
+
+#     # get number of directions and speeds
+#     n_ndirs = length(ndirs_vec)
+#     n_nspeeds = length(nspeeds_vec)
+
+#     # initialize convergence plots
+#     figure()
+#     subplot(211)
+#     plt.title("Monte Carlo Convergence Plots")
+#     plt.ylabel("Mean AEP\n(MWh)")
+
+#     subplot(212)
+#     plt.xlabel("Sample Size")
+#     plt.ylabel("Standard Deviation AEP\n(MWh)")
+
+#     # iterate through each speed and direction
+#     legend_labels = fill("", Int(n_ndirs*n_nspeeds))
+#     for i = [1]#:n_ndirs
+#         for j = [1]#:n_nspeeds
+#             # group into samples and calculate means and standard deviations
+#             n_sample_sizes = length(sample_sizes[i,j])
+#             mean_aeps = zeros(n_sample_sizes)
+#             std_aeps = zeros(n_sample_sizes)
+#             index_1 = 1
+#             index_2 = 0
+#             for k = 1:n_sample_sizes
+#                 index_2 += Int(sample_sizes[i,j][k])
+#                 mean_aeps[k] = mean(aeps[i,j][index_1:index_2])
+#                 std_aeps[k] = std(aeps[i,j][index_1:index_2])
+#                 index_1 = deepcopy(index_2)
+#             end
+#             subplot(211)
+#             scatter(sample_sizes[i,j], mean_aeps, color="C0")
+#             subplot(212)
+#             scatter(sample_sizes[i,j], std_aeps, color="C0")
+#             legend_labels[(i-1)*n_nspeeds + j] = "$(ndirs_vec[i]) dirs, $(nspeeds_vec[j]) speeds"
+#         end
+#     end
+
+#     # add legend
+#     plt.legend(legend_labels)
+
+#     # save figure
+#     if save_fig
+#         savefig(path_to_fig_directory * fig_file_name, dpi=600)
+#     end
+
+#     # show figure
+#     if show_fig
+#         plt.show()
+#     end
+# end
+
+function pairs(data)
+    (nobs, nvars) = size(data)
+    (fig, ax) = subplots(nvars, nvars, figsize=(8,8))
+    subplots_adjust(hspace=0.05, wspace=0.05)
+
+    # Plot data
+    for i = 1:nvars
+    for j = 1:nvars
+        if i != j
+            ax[i,j][:plot](data[:,j],data[:,i],"ob",mfc="none")
+        else
+            ax[i,j][:hist](data[:,i])
+        end
+        ax[i,j][:xaxis][:set_visible](false)
+        ax[i,j][:yaxis][:set_visible](false)
+    end
+    end
+
+    # Set tick positions
+    for i = 1:nvars
+    ax[i,1][:yaxis][:set_ticks_position]("left")
+    ax[i,end][:yaxis][:set_ticks_position]("right")
+    ax[1,i][:xaxis][:set_ticks_position]("top")
+    ax[end,i][:xaxis][:set_ticks_position]("bottom")
+    end
+
+    # Turn ticks on
+    cc = repmat([nvars, 1],int(ceil(nvars/2)),1)
+    for i = 1:nvars
+    ax[i,cc[i]][:yaxis][:set_visible](true)
+    ax[cc[i],i][:xaxis][:set_visible](true)
+    end
 end
 

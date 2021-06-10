@@ -3,20 +3,22 @@
 export SLURM_NTASKS=1
 
 # set what analyses to run
-calculate_initial_aeps=true
+calculate_initial_aeps=false
 calculate_aeps=false
 calculate_montecarlo_aeps=false
+calculate_initial_final_correlation=true
 plot_layouts=false
 plot_aeps=false
 plot_montecarlo=false
+plot_initial_final_scatter=false
 
 # set model parameters
 nturbines_vec=(16)
-boundary_radius_vec=(900) # 1350 1700)
-ndirs_vec=(8 10 12 14 16 18 20 22 24 26 28 30 33 36 45 51 60 72 90 120 180 360)              
-ndirs_vec_julia=[8,10,12,14,16,18,20,22,24,26,28,30,33,36,45,51,60,72,90,120,180,360]
-nspeeds_vec=(1 5 10 20)
-nspeeds_vec_julia=[01,05,10,20]
+boundary_radius_vec=(1350)
+ndirs_vec=(20 120) #(8 10 12 14 16 18 20 22 24 26 28 30 33 36 45 51 60 72 90 120 180 360)              
+ndirs_vec_julia=[20,120] #[8,10,12,14,16,18,20,22,24,26,28,30,33,36,45,51,60,72,90,120,180,360]
+nspeeds_vec=(1 20) #(1 5 10 20)
+nspeeds_vec_julia=[1,20] #[01,05,10,20]
 windrose=HornsRevWindRose
 turbine_type=VestasV80_2MW
 wake_model_vec=(GaussYawVariableSpread)
@@ -24,7 +26,7 @@ opt_algorithm=SnoptWECAlgorithm
 
 # set layout numbers
 layout_number_start=1
-layout_number_end=2
+layout_number_end=200
 
 # AEP plot parameters
 aeps_fig_type=ConfidenceIntervalScatterPlot
@@ -143,7 +145,10 @@ do
                         $aeps_file_name \
                         $aeps_plot_directory_path \
                         "$aeps_fig_title" \
-                        $aeps_fig_type
+                        $aeps_fig_type \
+                        $nturbines \
+                        $boundary_radius
+
                 fi
                 
                 if $plot_montecarlo == true
@@ -152,6 +157,7 @@ do
                     aeps_directory_partial_path="../results/final-aeps/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/"
                     montecarlo_plot_directory_path="../results/figures/aep-plots/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/reanalyzed-with-${analysis_wake_model}/"
                     aeps_fig_title=""
+                    max_aeps_file_path="../results/final-aeps/circle/max_aep_circle.yaml"
                     julia plot_montecarlo.jl \
                         $ndirs_vec_julia \
                         $nspeeds_vec_julia \
@@ -160,8 +166,51 @@ do
                         $layout_number_end \
                         $aeps_directory_partial_path \
                         "montecarlo-final-aeps-${analysis_wake_model}.txt" \
-                        $montecarlo_plot_directory_path
+                        $montecarlo_plot_directory_path \
+                        $nturbines \
+                        $boundary_radius
                 fi 
+
+                if $plot_initial_final_scatter == true
+                then
+                    initial_aeps_directory_path="../data/initial-aeps/circle/${nturbines}turb/${boundary_radius}r/"
+                    final_aeps_directory_partial_path="../results/final-aeps/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/"
+                    scatter_plot_directory_path="../results/figures/aep-plots/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/reanalyzed-with-${analysis_wake_model}/"
+                    aeps_fig_title=""
+                    max_aeps_file_path="../results/final-aeps/circle/max_aep_circle.yaml"
+                    julia plot_initial_final_aep_scatter.jl \
+                        $ndirs_vec_julia \
+                        $nspeeds_vec_julia \
+                        $analysis_wake_model \
+                        $layout_number_start \
+                        $layout_number_end \
+                        $initial_aeps_directory_path \
+                        $final_aeps_directory_partial_path \
+                        "montecarlo-initial-aeps-${analysis_wake_model}.txt" \
+                        "montecarlo-final-aeps-${analysis_wake_model}.txt" \
+                        $scatter_plot_directory_path \
+                        $nturbines \
+                        $boundary_radius
+                fi
+
+                if $calculate_initial_final_correlation == true
+                then
+                    initial_aeps_directory_path="../data/initial-aeps/circle/${nturbines}turb/${boundary_radius}r/"
+                    final_aeps_directory_partial_path="../results/final-aeps/circle/${nturbines}turb/${boundary_radius}r/${windrose}/${turbine_type}/${wake_model}/${opt_algorithm}/"
+                    julia calc_initial_final_aep_cor.jl \
+                        $ndirs_vec_julia \
+                        $nspeeds_vec_julia \
+                        $analysis_wake_model \
+                        $layout_number_start \
+                        $layout_number_end \
+                        $initial_aeps_directory_path \
+                        $final_aeps_directory_partial_path \
+                        "montecarlo-initial-aeps-${analysis_wake_model}.txt" \
+                        "montecarlo-final-aeps-${analysis_wake_model}.txt" \
+                        $nturbines \
+                        $boundary_radius
+                fi
+
             done
         done
     done

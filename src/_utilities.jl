@@ -1,6 +1,7 @@
 using Snopt
 using ForwardDiff
 using FillArrays
+using DelimitedFiles
 
 function filter_aeps(aeps_raw; layouts_must_match=true)
     n_ndirs = length(aeps_raw[:,1])
@@ -57,6 +58,13 @@ function normalize_aeps(aeps::Array{Array{Float64,1},2})
 end
 
 
+function get_aep_values_from_file_names(data_file_name::String)
+    # get the AEP values from the files
+    aeps = readdlm(data_file_name, skipstart=1)[:,2]
+    return aeps
+end
+
+
 function get_aep_values_from_file_names(data_file_names::Array{String,1})
     # get the AEP values from the files
     ngroups = length(data_file_names)
@@ -86,7 +94,7 @@ end
 function get_log_spaced_montecarlo_points(n_points, n_samples)
 
     function obj(x)
-        -x[1]
+        -x[1]/1e6
     end
 
     function con(x, n)
@@ -132,3 +140,19 @@ function get_log_spaced_montecarlo_points(n_points, n_samples)
 
 end
 
+
+function calc_mean_upper10percent(x)
+    n_x = length(x)
+    index_90percentile = Int(round(0.8*n_x))
+    sorted_indices = sortperm(x)
+    mean_upper10percent_aeps = mean(x[sorted_indices[index_90percentile:end]])
+    return mean_upper10percent_aeps
+end
+
+function calc_std_upper10percent(x)
+    n_x = length(x)
+    index_90percentile = Int(round(0.8*n_x))
+    sorted_indices = sortperm(x)
+    std_upper10percent_aeps = std(x[sorted_indices[index_90percentile:end]])
+    return std_upper10percent_aeps
+end

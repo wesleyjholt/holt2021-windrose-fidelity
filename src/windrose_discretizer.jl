@@ -142,13 +142,20 @@ function write_windrose_yaml(output_windrose_filepath, directions, direction_pro
 
 end
 
-function plot_windrose_single_speed(input_filename, output_filename; input_directory="", output_directory="", show_fig=true, save_fig=false)
+function plot_windrose_single_speed(input_filename, output_filename; input_directory="", output_directory="", show_fig=true, save_fig=false, file_type="txt")
     
     # load original wind resource
-    windrose_data = readdlm(input_directory * input_filename, skipstart=1)
-    directions = windrose_data[:,1]
-    speeds = windrose_data[:,2]
-    probs = windrose_data[:,3]
+    if file_type == "txt"
+        windrose_data = readdlm(input_directory * input_filename, skipstart=1)
+        directions = windrose_data[:,1]
+        speeds = windrose_data[:,2]
+        probs = windrose_data[:,3]
+    elseif file_type == "yaml"
+        windrose_data = YAML.load_file(input_directory * input_filename)["definitions"]["wind_inflow"]["properties"]
+        directions = windrose_data["direction"]["bins"]
+        speeds = windrose_data["speed"]["bins"]
+        probs = windrose_data["direction"]["frequency"]
+    end
     ndirs = length(directions)
     nspeeds = length(speeds)
     directionRes = directions[2] - directions[1]
@@ -167,7 +174,7 @@ function plot_windrose_single_speed(input_filename, output_filename; input_direc
     # plot
     b = plt.bar(directions .* pi/180, probs, width=(directionRes - 3.0/sqrt(ndirs))*pi/180, color=cm(0.5))
     # fig.legend()
-    title("Nantucket Wind Rose with " * string(ndirs) * " Directions", fontsize=16)
+    # title("Wind Rose with " * string(ndirs) * " Directions", fontsize=16)
 
     if save_fig
         savefig(output_directory * output_filename, dpi=600)
@@ -224,6 +231,19 @@ function create_new_windrose_file_hornsrev(ndirs, nspeeds)
 
 end
 
+function create_new_windrose_plot_hornsrev_average_speed(ndirs_vec)
+    
+    # set up input and output files, and create the plots
+    input_directory = "../data/windrose-files/"
+    output_directory = "../data/windrose-files/"
+    for ndirs = ndirs_vec
+        input_filename = "horns-rev/horns-rev-windrose-" * lpad(ndirs, 3, "0") * "dirs-01speeds.yaml"
+        output_filename = "horns-rev-figures/horns-rev-windrose-" * lpad(ndirs, 3, "0") * "dirs-01speeds.png"
+        plot_windrose_single_speed(input_filename, output_filename; input_directory=input_directory, output_directory=output_directory, show_fig=true, save_fig=true, file_type="yaml")
+    end
+
+end
+
 # # ---- These are the only value that need to be changed. ----
 # create_new_windrose_file = true
 # create_new_windrose_plot = true
@@ -238,10 +258,10 @@ end
 #     create_new_windrose_plot_nantucket(ndirs_vec)
 # end
 
-ndirs_vec = [12, 36, 72, 120, 360]
-nspeeds_vec = [1, 2, 5, 10, 25, 50]
-for ndirs in ndirs_vec
-    for nspeeds in nspeeds_vec
-        create_new_windrose_file_hornsrev(ndirs, nspeeds)
-    end
-end
+# ndirs_vec = [12, 36, 72, 120, 360]
+# nspeeds_vec = [1, 2, 5, 10, 25, 50]
+# for ndirs in ndirs_vec
+#     for nspeeds in nspeeds_vec
+#         create_new_windrose_file_hornsrev(ndirs, nspeeds)
+#     end
+# end

@@ -15,24 +15,24 @@ nspeeds_vec=(1 5 10 20)
 
 # quantity and type of initial layouts to create
 boundary_type=CircleBoundary
-boundary_radius_vec=(900 1350)
+boundary_radius_vec=(1350)
 nturbines=16
 rotor_diameter=80
-layout_number_start=1
-layout_number_end=100
+layout_number_start=5001
+layout_number_end=10000
 
-# create wind rose files
-if create_windroses==true
-then
-    for ndirs in ${ndirs_vec[@]}
-    do
-        for nspeeds in ${nspeeds_vec[@]}
-        do
-            echo "Creating wind rose with $ndirs directions and $nspeeds speeds..."
-            julia generate_windrose.jl $windrose $ndirs $nspeeds
-        done
-    done
-fi
+# # create wind rose files
+# if create_windroses==true
+# then
+#     for ndirs in ${ndirs_vec[@]}
+#     do
+#         for nspeeds in ${nspeeds_vec[@]}
+#         do
+#             echo "Creating wind rose with $ndirs directions and $nspeeds speeds..."
+#             julia generate_windrose.jl $windrose $ndirs $nspeeds
+#         done
+#     done
+# fi
 
 # create initial layout files
 if create_initial_layouts==true

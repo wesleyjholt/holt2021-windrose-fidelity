@@ -99,7 +99,7 @@ def plot_windrose_polar_iea37(input_filename, output_filename, input_directory="
     directions_figuredata = []
     speeds_figuredata = []
     # calculate how many times each wind direction bin will show up as an element in the directions_figuredata vector
-    nvalues_in_direction_bins = np.round(direction_pmf*ndirs*1e5).astype(np.int)
+    nvalues_in_direction_bins = np.round(direction_pmf*ndirs*1e6).astype(np.int)
     # iterate through each wind direction
     for d in np.arange(ndirs):
         # assign the direction bin value to a precalculated amount of elements in the directions_figuredata vector
@@ -130,9 +130,11 @@ def plot_windrose_polar_iea37(input_filename, output_filename, input_directory="
     directionEdges = np.append(directions, directions[0] + 360) - directionRes/2
     # set the values for the edges of the speed bins
     speedEdges = np.zeros(nspeeds+1)
+    print(speeds)
     speedEdges[-1] = round(speeds[-1] + (speeds[-1] - speeds[-2])/2, 1)
     for s in np.arange(nspeeds-1):
         speedEdges[s+1] = round((speeds[s] + speeds[s+1])/2, 1)
+    # speedEdges = np.array([0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0])
     # create bin size data
     binsizes,_,_ = np.histogram2d(speeds_figuredata, directions_figuredata, np.array([speedEdges, directionEdges]))
     # normalize the bin sizes
@@ -142,13 +144,20 @@ def plot_windrose_polar_iea37(input_filename, output_filename, input_directory="
     #### ---- create the wind rose plot ----
 
     # create blank figure
-    fig = plt.figure(figsize=(8,8))
+    fig = plt.figure(figsize=(10,8))
     # set location of windrose on the figure and change coordinate type to polar
     ax = fig.add_axes(([0.07,0.15,0.725,0.725]), polar=True)
     # set the direction of increasing theta to be clockwise
     ax.set_theta_direction(-1)
     # set theta to start at the vertical axis 
     ax.set_theta_offset(np.pi/2.0)
+    # tick properties
+    ax.tick_params(axis='x', labelsize=30)
+    ax.tick_params(axis='y', labelsize=20)
+    ax.xaxis.set_tick_params(pad=30)
+    ax.set_ylim([0, 0.018])
+    ax.set_yticks([0.01, 0.015])
+    ax.set_rlabel_position(0)
     # set color map
     blues = cm.get_cmap("Blues")(np.array(speeds[::-1])/speeds[-1])
     # initialize lists to hold info for the legend
@@ -162,9 +171,9 @@ def plot_windrose_polar_iea37(input_filename, output_filename, input_directory="
         bars.append(b)
         legend_labels.append(str(np.round(speeds[nspeeds-i-1],1)) + " m/s")
     # add legend
-    plt.legend(bars, legend_labels, loc=(1.07,.15))
+    plt.legend(bars, legend_labels, loc=(1.16,.2), prop={'size': 15})
     # title the wind rose plot
-    plt.title("Wind Rose with " + str(ndirs) + " Directions")
+    # plt.title("Wind Rose with " + str(ndirs) + " Directions")
 
     if save_fig:
         plt.savefig(output_directory + output_filename, dpi=600)
@@ -205,8 +214,8 @@ if create_new_windrose_file:
 if create_new_windrose_plot:
     create_new_windrose_plot_iea37(ndirs_vec)
 
-ndirs_vec = [12, 36, 72, 120, 360]
-nspeeds_vec = [2, 5, 10, 25, 50]
+ndirs_vec = [20] #[12, 36, 72, 120, 360]
+nspeeds_vec = [20] #[2, 5, 10, 25, 50]
 def create_new_windrose_plot_hornsrev(ndirs_vec, nspeeds_vec):
     
     # set up input and output files, and create the plots
@@ -218,7 +227,9 @@ def create_new_windrose_plot_hornsrev(ndirs_vec, nspeeds_vec):
             output_filename = "horns-rev-windrose-" + str(ndirs).rjust(3,'0') + "dirs-" + str(nspeeds).rjust(2,'0') + "speeds.png"
             plot_windrose_polar_iea37(input_filename, output_filename, input_directory=input_directory, output_directory=output_directory, show_fig=False, save_fig=True)
 
-create_new_windrose_plot_hornsrev(ndirs_vec, nspeeds_vec)
+# create_new_windrose_plot_hornsrev(ndirs_vec, nspeeds_vec)
+
+plot_windrose_polar_iea37("winner-colome-windrose-024dirs-07speeds.yaml", "winner-colome-windrose-024dirs-07speeds.png", input_directory="../data/windrose-files/winner-colome/", output_directory="../data/windrose-files/winner-colome-figures/", show_fig=False, save_fig=True)
 
 # TODO: Create a pdf plot of a wind speed for a direction that shows the different colors used on the wind rose.
 
