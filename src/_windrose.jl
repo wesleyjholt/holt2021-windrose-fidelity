@@ -18,13 +18,14 @@ Container holding parameters for the Nantucket wind rose
 struct NantucketWindRose{I, F} <: WindRose
     ndirs::I
     nspeeds::I
+    measurement_height::F
     air_density::F
     ambient_ti::F
     shear_exponent::F
 end
-NantucketWindRose() = NantucketWindRose(10, 1, 1.225, 0.108, 0.31)
-NantucketWindRose(ndirs) = NantucketWindRose(ndirs,  1, 1.225, 0.108, 0.31)
-NantucketWindRose(ndirs, nspeeds) = NantucketWindRose(ndirs, nspeeds, 1.225, 0.108, 0.31)
+NantucketWindRose() = NantucketWindRose(10, 1, 70.0, 1.225, 0.108, 0.31)
+NantucketWindRose(ndirs) = NantucketWindRose(ndirs, 1, 70.0, 1.225, 0.108, 0.31)
+NantucketWindRose(ndirs, nspeeds) = NantucketWindRose(ndirs, nspeeds, 70.0, 1.225, 0.108, 0.31)
 
 """
     HornsRevWindRose(ndirs, nspeeds)
@@ -38,13 +39,14 @@ Container holding parameters for the Horns Rev wind rose
 struct HornsRevWindRose{I, F} <: WindRose
     ndirs::I
     nspeeds::I
+    measurement_height::F
     air_density::F
     ambient_ti::F
     shear_exponent::F
 end
-HornsRevWindRose() = HornsRevWindRose(10, 1, 1.225, 0.108, 0.31)
-HornsRevWindRose(ndirs) = HornsRevWindRose(ndirs, 1, 1.225, 0.108, 0.31)
-HornsRevWindRose(ndirs, nspeeds) = HornsRevWindRose(ndirs, nspeeds, 1.225, 0.108, 0.31)
+HornsRevWindRose() = HornsRevWindRose(10, 1, 70.0, 1.225, 0.108, 0.31)
+HornsRevWindRose(ndirs) = HornsRevWindRose(ndirs, 1, 70.0, 1.225, 0.108, 0.31)
+HornsRevWindRose(ndirs, nspeeds) = HornsRevWindRose(ndirs, nspeeds, 70.0, 1.225, 0.108, 0.31)
 
 
 """
@@ -93,9 +95,11 @@ function resample_wind_resource(windrose::HornsRevWindRose)
     # resample discretized wind rose
     if windrose.nspeeds != 1
         # wind speed discretized distributions
+        average_speeds = false
         directions, direction_probabilities, speeds, speed_probabilities = resample_discretized_windrose_multiple_speeds_weibull(directions_orig, direction_probabilities_orig, speed_weibull_params_orig, windrose.ndirs, windrose.nspeeds)
     else
         # average wind speeds
+        average_speeds = true
         directions, direction_probabilities, speeds = resample_discretized_windrose_average_speeds_weibull(directions_orig, direction_probabilities_orig, speed_weibull_params_orig, windrose.ndirs)
         speed_probabilities = []
     end
@@ -104,75 +108,77 @@ function resample_wind_resource(windrose::HornsRevWindRose)
     output_windrose_filepath = "../data/windrose-files/horns-rev/horns-rev-windrose-$(lpad(windrose.ndirs,3,"0"))dirs-$(lpad(windrose.nspeeds,2,"0"))speeds.yaml"
     title = "Horns Rev 1 Wind Rose, $(windrose.ndirs) wind directions, $(windrose.nspeeds) wind speeds"
     description = "Wind resource conditions, using direction and speed distribution from the paper by Ju Feng and Wen Zhong Shen: \nModelling Wind for Wind Farm Layout Optimization Using Joint Distribution of Wind Speed and Wind Direction \nhttps://backend.orbit.dtu.dk/ws/portalfiles/portal/110639016/Modelling_Wind_for_Wind_Farm_Layout.pdf"
-    turbulence_intensity = 0.75
-    write_windrose_yaml(output_windrose_filepath, directions, direction_probabilities, speeds, speed_probabilities, turbulence_intensity, title=title, description=description)
+    
+    # write_windrose_yaml(output_windrose_filepath, directions, direction_probabilities, speeds, speed_probabilities, turbulence_intensity, title=title, description=description)
+    ff.write_wind_resource_YAML(output_windrose_filepath, directions, direction_probabilities, speeds, speed_probabilities, windrose.measurement_height, windrose.air_density, windrose.ambient_ti, windrose.shear_exponent,
+        title=title, description=description)
 end
 
 
-"""
-    get_wind_resource_model(windrose::NantucketWindRose)
+# """
+#     get_wind_resource_model(windrose::NantucketWindRose)
 
-Creates a FlowFarm wind resource model for the Nantucket wind resource.
+# Creates a FlowFarm wind resource model for the Nantucket wind resource.
 
-# Arguments
-- `windrose::NantucketWindRose`: container holding parameters for the Nantucket wind rose
-"""
-function get_wind_resource_model(windrose::NantucketWindRose)
-    # get wind directions and speeds joint pmf
-    windrose_file_path = "../data/windrose-files/nantucket/nantucket-windrose-ave-speeds-$(lpad(windrose.ndirs, 3, "0"))dirs.txt"
-    windrose_data = readdlm(windrose_file_path, skipstart=1)
-    wind_directions = windrose_data[:,1]*pi/180          # radians
-    wind_speeds = windrose_data[:,2]                     # m/s
-    wind_probabilities = windrose_data[:,3]
+# # Arguments
+# - `windrose::NantucketWindRose`: container holding parameters for the Nantucket wind rose
+# """
+# function get_wind_resource_model(windrose::NantucketWindRose)
+#     # get wind directions and speeds joint pmf
+#     windrose_file_path = "../data/windrose-files/nantucket/nantucket-windrose-ave-speeds-$(lpad(windrose.ndirs, 3, "0"))dirs.txt"
+#     windrose_data = readdlm(windrose_file_path, skipstart=1)
+#     wind_directions = windrose_data[:,1]*pi/180          # radians
+#     wind_speeds = windrose_data[:,2]                     # m/s
+#     wind_probabilities = windrose_data[:,3]
     
-    # set remaining wind parameters
-    nstates = length(wind_speeds)
-    ambient_tis = zeros(nstates) .+ windrose.ambient_ti
-    measurement_height = zeros(nstates) .+ 80.0
+#     # set remaining wind parameters
+#     nstates = length(wind_speeds)
+#     ambient_tis = zeros(nstates) .+ windrose.ambient_ti
+#     measurement_height = zeros(nstates) .+ 80.0
 
-    # set FlowFarm wind resource models
-    wind_shear_model = ff.PowerLawWindShear(windrose.shear_exponent)
-    wind_resource = ff.DiscretizedWindResource(wind_directions, wind_speeds, wind_probabilities, measurement_height, windrose.air_density, ambient_tis, wind_shear_model)
+#     # set FlowFarm wind resource models
+#     wind_shear_model = ff.PowerLawWindShear(windrose.shear_exponent)
+#     wind_resource = ff.DiscretizedWindResource(wind_directions, wind_speeds, wind_probabilities, measurement_height, windrose.air_density, ambient_tis, wind_shear_model)
     
-    return wind_resource
-end
+#     return wind_resource
+# end
 
-"""
-    get_wind_resource_model(windrose::HornsRevWindRose)
+# """
+#     get_wind_resource_model(windrose::HornsRevWindRose)
 
-Creates a FlowFarm wind resource model for the Horns Rev 1 wind resource.
+# Creates a FlowFarm wind resource model for the Horns Rev 1 wind resource.
 
-# Arguments
-- `windrose::HornsRevWindRose`: container holding parameters for the Horns Rev 1 wind rose
-"""
-function get_wind_resource_model(windrose::HornsRevWindRose)
+# # Arguments
+# - `windrose::HornsRevWindRose`: container holding parameters for the Horns Rev 1 wind rose
+# """
+# function get_wind_resource_model(windrose::HornsRevWindRose)
 
-    # get wind directions and speeds joint pmf
-    windrose_file_path = "../data/windrose-files/horns-rev/horns-rev-windrose-$(lpad(windrose.ndirs,3,"0"))dirs-$(lpad(windrose.nspeeds,2,"0"))speeds.yaml"
-    if windrose.nspeeds != 1
-        # wind speed discretized distributions
-        wind_directions, wind_speeds, wind_probabilities, ambient_ti = ff.get_wind_rose_YAML(windrose_file_path)
-    else
-        # average wind speeds
-        wind_data = YAML.load_file(windrose_file_path)["definitions"]["wind_inflow"]["properties"]
-        wind_directions = wind_data["direction"]["bins"]
-        wind_speeds = wind_data["speed"]["bins"]
-        wind_probabilities = wind_data["direction"]["frequency"]
-        ambient_ti = wind_data["turbulence_intensity"]["default"]
-    end
-    wind_directions *= pi/180.0
+#     # get wind directions and speeds joint pmf
+#     windrose_file_path = "../data/windrose-files/horns-rev/horns-rev-windrose-$(lpad(windrose.ndirs,3,"0"))dirs-$(lpad(windrose.nspeeds,2,"0"))speeds.yaml"
+#     if windrose.nspeeds != 1
+#         # wind speed discretized distributions
+#         wind_directions, wind_speeds, wind_probabilities, ambient_ti = ff.get_wind_rose_YAML(windrose_file_path)
+#     else
+#         # average wind speeds
+#         wind_data = YAML.load_file(windrose_file_path)["definitions"]["wind_inflow"]["properties"]
+#         wind_directions = wind_data["direction"]["bins"]
+#         wind_speeds = wind_data["speed"]["bins"]
+#         wind_probabilities = wind_data["direction"]["frequency"]
+#         ambient_ti = wind_data["turbulence_intensity"]["default"]
+#     end
+#     wind_directions *= pi/180.0
     
-    # set remaining wind parameters
-    nstates = length(wind_speeds)
-    ambient_tis = zeros(nstates) .+ windrose.ambient_ti
-    measurement_height = zeros(nstates) .+ 80.0
+#     # set remaining wind parameters
+#     nstates = length(wind_speeds)
+#     ambient_tis = zeros(nstates) .+ windrose.ambient_ti
+#     measurement_height = zeros(nstates) .+ 80.0
 
-    # set FlowFarm wind resource models
-    wind_shear_model = ff.PowerLawWindShear(windrose.shear_exponent)
-    wind_resource = ff.DiscretizedWindResource(wind_directions, wind_speeds, wind_probabilities, measurement_height, windrose.air_density, ambient_tis, wind_shear_model)
+#     # set FlowFarm wind resource models
+#     wind_shear_model = ff.PowerLawWindShear(windrose.shear_exponent)
+#     wind_resource = ff.DiscretizedWindResource(wind_directions, wind_speeds, wind_probabilities, measurement_height, windrose.air_density, ambient_tis, wind_shear_model)
     
-    return wind_resource
-end
+#     return wind_resource
+# end
 
 
 
