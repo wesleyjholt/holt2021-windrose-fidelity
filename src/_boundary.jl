@@ -283,7 +283,7 @@ function generate_random_points_in_boundary(n, boundary_func, xrange, yrange, mi
             good_point = true   # this will be set to false if the generated point is not feasible
             # print out the number of loops every 1e6 loops
             if mod(count,1e6)==0 && count > 0
-                println("Loop count: ", count, "\nLoosening the minimum spacing requirement.")
+                println("Loop count: ", count, "\nLoosening the minimum spacing requirement to generate random initial layout.")
                 min_spacing *= 0.75
             end
             # update the counter
